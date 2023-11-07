@@ -1,0 +1,28 @@
+{% extends 'scaffold.html' %}
+
+{% block content %}
+    <div id="loginContainer" class="basicContainer basicLoginContainer">
+        <h1>Login</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="/login" method="post">
+            <label for="username" class="form-label">Nutzername</label>
+            <input type="text" name="username" id="username" placeholder="Nutzername" class="form-control">
+            <label for="password" class="form-label">Passwort</label>
+            <input type="password" name="password" id="password" placeholder="Passwort" class="form-control">
+            <label for="remember_me" class="form-check-label">Angemeldet bleiben</label>
+            <input type="checkbox" name="remember_me" id="remember_me" class="form-check-input">
+            <div id="loginFormButtonBar">
+                <button type="submit" class="btn btn-primary">Anmelden</button>
+                <a href="{{ url_for('auth.signup') }}"><button type="button" class="btn btn-secondary">Registrieren</button></a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
