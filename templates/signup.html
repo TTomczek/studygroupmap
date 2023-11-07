@@ -1,0 +1,31 @@
+{% extends 'scaffold.html' %}
+
+{% block content %}
+    <div id="signupContainer" class="basicContainer basicLoginContainer">
+        <h1>Registrieren</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {{ messages }}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ messages }}
+                        {% if category == "warning" %}
+                            <a href="{{ url_for('auth.login') }}">Zum Login</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="/signup" method="post">
+            <label for="email" class="form-label">E-Mail</label>
+            <input type="text" name="email" id="email" placeholder="max@mustermann.de" class="form-control">
+            <label for="username" class="form-label">Nutzername</label>
+            <input type="text" name="username" id="username" placeholder="Nutzername" class="form-control">
+            <label for="password" class="form-label">Passwort</label>
+            <input type="password" name="password" id="password" placeholder="Passwort" class="form-control">
+            <div id="loginFormButtonBar">
+                <button type="submit" class="btn btn-primary">Registrieren</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+  "SECRET_KEY": "h655rQbtX3EaPkwuVndc",
+  "SQLALCHEMY_DATABASE_URI": "sqlite:///db.sqlite",
+  "PEPPER": "$2b$12$mf3RPeGBHmzd/dMZjBCNG.",
+  "TIMEZONE": "Europe/Berlin"
+}
