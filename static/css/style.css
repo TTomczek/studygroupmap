@@ -1,9 +1,14 @@
 .basicContainer {
     margin: 1rem;
-    padding: 20px;
+    padding: 1.25rem;
     border: 1px solid #ccc;
     background: #f3f3f3;
     border-radius: 1rem;
+}
+
+.secondaryContainer {
+    background: #f8f8f8;
+    margin: 0;
 }
 
 .basicLoginContainer {
@@ -14,3 +19,40 @@
 #loginFormButtonBar {
     margin-top: 1rem;
 }
+
+#studygroup-dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: calc(20% - 1rem);
+    gap: 1rem;
+}
+
+.studygroupContainer {
+    margin: 0;
+    padding: 0.3rem 0.8rem;
+    color: white;
+    background: var(--bs-primary);
+    display: inline-block;
+    width: calc(20% - 1rem);
+    flex-grow: 0;
+}
+
+.studygroupName {
+    font-weight: bold;
+    display: inline;
+}
+
+.studygroupDashboardHeader > i {
+    margin-left: 0.8rem;
+}
+
+#mapToolbar {
+    padding: 0;
+    border: 0;
+}
+
+#mapToolbar > button:not(:last-child) {
+    margin-right: 0.5rem;
+}
+
+

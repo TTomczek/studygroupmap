@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 
 {% block basecontent %}
-    <h1>{{ title }}</h1>
-    <p>{{ content }}</p>
+    <div class="basicContainer">
+        {% if studygroups %}
+            <h2>Meine Lerngruppen</h2>
+            <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">
+                {% for group in studygroups %}
+                    <div class=" basicContainer studygroupContainer">
+                        <div class="studygroupDashboardHeader">
+                            <div class="studygroupName">{{ group.name }}</div> <i class="bi bi-people"></i> {{ group.member_count }}
+                        </div>
+                        <div class="memberCount"></div>
+                        <div class="studygroupDescription">{{ group.description }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="basicContainer secondaryContainer">
+            <div class="basicContainer secondaryContainer mb-3" id="mapToolbar">
+                <button class="btn btn-primary">Studierende</button>
+                <button class="btn btn-primary">Gruppen</button>
+            </div>
+            {{ map | safe }}
+        </div>
+    </div>
 {% endblock %}

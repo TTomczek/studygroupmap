@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, PasswordField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError
-from app.models import User
+from app.database import User
 
 
 class ProfileForm(FlaskForm):
@@ -42,6 +42,7 @@ class ProfileForm(FlaskForm):
         self.city.data = user.city
         self.country.data = user.country
 
+    @staticmethod
     def validate_password(form, field):
         if field.data == "":
             return
@@ -49,9 +50,11 @@ class ProfileForm(FlaskForm):
         if len(field.data) < 8:
             raise ValidationError('Passwort muss zwischen 8 und 72 Zeichen lang sein')
 
+    @staticmethod
     def validate_password_repeat(form, field):
+        if field.data != form.password.data:
+            raise ValidationError('Passwörter müssen übereinstimmen')
+
         if field.data == "":
             return
 
-        if field.data != form.password.data:
-            raise ValidationError('Passwörter müssen übereinstimmen')

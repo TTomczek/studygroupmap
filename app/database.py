@@ -3,8 +3,9 @@ from datetime import datetime
 import bcrypt
 import pytz
 from flask_login import UserMixin
+from sqlalchemy import text
 
-from app import db, app
+from app import db, app, geocode
 
 TZ = app.config['TIMEZONE']
 
@@ -35,8 +36,7 @@ class User(UserMixin, db.Model):
                  email,
                  password,
                  id=None,
-                 studentnumber=0,
-):
+                 studentnumber=0):
         self.id = id
         self.username = username
         self.email = email
@@ -44,13 +44,17 @@ class User(UserMixin, db.Model):
         self.studentnumber = studentnumber
 
     def __str__(self):
-        return self.firstname + " " + self.lastname
-
-    def __repr__(self):
-        return self.id
+        return self.id + "-" + self.username + "-" + self.email
 
     def __eq__(self, other):
         return self.id == other.id
+
+    def update_location(self):
+        location = geocode(self.street + ", " + self.postcode + " " + self.city + ", " + self.country)
+        if location is not None:
+            self.latitude = location.latitude
+            self.longitude = location.longitude
+            db.session.commit()
 
     @staticmethod
     def hash_password(password):
@@ -87,18 +91,11 @@ class Studygroup(db.Model):
     creator = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creation_time = db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone(TZ)))
 
-    def __init__(self, id=0, name="", description="", creator=0, creation_time=datetime.now(pytz.timezone(TZ))):
+    def __init__(self, id=None, name="", description="", creator=0):
         self.id = id
         self.name = name
         self.description = description
         self.creator = creator
-        self.creation_time = creation_time
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return self.id
 
 
 class StudygroupUser(db.Model):
@@ -109,14 +106,17 @@ class StudygroupUser(db.Model):
     user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     joiningdate = db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone(TZ)))
 
-    def __init__(self, id=-1, studygroup=-1, user=-1, joiningdate=datetime.now(pytz.timezone(TZ))):
+    def __init__(self, studygroup, user, id=None, joiningdate=datetime.now(pytz.timezone(TZ))):
         self.id = id
         self.studygroup = studygroup
         self.user = user
         self.joiningdate = joiningdate
 
-    def __str__(self):
-        return str(self.studygroup) + "-" + str(self.user)
 
-    def __repr__(self):
-        return str(self.id)
+def get_studygroups_of_user_for_dashboard(user):
+    studygroups = db.session.execute(
+        text("SELECT sg.*, count(sgu.user) as member_count FROM Studygroup sg "
+             "INNER JOIN studygroup_user sgu ON sg.id = sgu.studygroup "
+             "WHERE sg.id IN (SELECT DISTINCT sgu1.studygroup FROM studygroup_user sgu1 WHERE sgu1.user = :user)"
+             "GROUP BY sg.id;"), {"user": user.id}).fetchall()
+    return studygroups
