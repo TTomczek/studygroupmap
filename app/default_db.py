@@ -1,4 +1,4 @@
-from .database import User, Studygroup, StudygroupUser
+from .database import User, Studygroup, StudygroupUser, JoinRequest
 
 
 def init_db(db):
@@ -16,7 +16,8 @@ def init_db(db):
         user1.courseofstudy = "Computer Science"
         user1.semester = "3"
         user1.isFirstLogin = False
-        user1.update_location()
+        user1.latitude = 51.5151783
+        user1.longitude = 7.2816362
         db.session.add(user1)
 
     if User.query.filter_by(username="user2").first() is None:
@@ -32,7 +33,8 @@ def init_db(db):
         user2.courseofstudy = "Computer Science"
         user2.semester = "3"
         user2.isFirstLogin = False
-        user2.update_location()
+        user2.latitude = 51.6093647
+        user2.longitude = 7.5123653
         db.session.add(user2)
 
     if User.query.filter_by(username="user3").first() is None:
@@ -48,7 +50,8 @@ def init_db(db):
         user3.courseofstudy = "Computer Science"
         user3.semester = "3"
         user3.isFirstLogin = False
-        user3.update_location()
+        user3.latitude = 51.5001804
+        user3.longitude = 7.6162948
         db.session.add(user3)
 
     if User.query.filter_by(username="user4").first() is None:
@@ -64,7 +67,8 @@ def init_db(db):
         user4.courseofstudy = "Computer Science AI"
         user4.semester = "7"
         user4.isFirstLogin = False
-        user4.update_location()
+        user4.latitude = 51.3703058
+        user4.longitude = 7.4655616
         db.session.add(user4)
 
     if User.query.filter_by(username="user5").first() is None:
@@ -80,7 +84,8 @@ def init_db(db):
         user5.courseofstudy = "Computer Science AI"
         user5.semester = "7"
         user5.isFirstLogin = False
-        user5.update_location()
+        user5.latitude = 51.4180251
+        user5.longitude = 7.567113
         db.session.add(user5)
 
     if User.query.filter_by(username="user6").first() is None:
@@ -96,7 +101,8 @@ def init_db(db):
         user6.courseofstudy = "Computer Science Network Engineering"
         user6.semester = "1"
         user6.isFirstLogin = False
-        user6.update_location()
+        user6.latitude = 51.3771835
+        user6.longitude = 7.696676
         db.session.add(user6)
 
     db.session.commit()
@@ -129,3 +135,8 @@ def init_db(db):
     db.session.add(group42)
 
     db.session.commit()
+
+    if JoinRequest.query.filter_by(user=6, studygroup=1).first() is None:
+        join_request = JoinRequest(user=6, studygroup=1, message="Ich will auch AI studieren!")
+        db.session.add(join_request)
+        db.session.commit()

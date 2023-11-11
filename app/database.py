@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     latitude = db.Column(db.Float, nullable=True, default=0.0)
     longitude = db.Column(db.Float, nullable=True, default=0.0)
     isFirstLogin = db.Column(db.Boolean, nullable=False, default=True)
+    canBeInvited = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self,
                  username,
@@ -90,12 +91,38 @@ class Studygroup(db.Model):
     description = db.Column(db.String(500), nullable=False)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creation_time = db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone(TZ)))
+    is_locked = db.Column(db.Boolean, nullable=False, default=False)
 
     def __init__(self, id=None, name="", description="", creator=0):
         self.id = id
         self.name = name
         self.description = description
         self.creator = creator
+
+    def get_group_location(self):
+
+        users_in_group = db.session.execute(
+            text('SELECT * FROM User INNER JOIN studygroup_user ON User.id = studygroup_user.user '
+                 'WHERE studygroup_user.studygroup = :studygroup'), {"studygroup": self.id}).fetchall()
+
+        center_lat = 0
+        center_lon = 0
+
+        for user in users_in_group:
+            center_lat += user.latitude
+            center_lon += user.longitude
+
+        center_lat /= len(users_in_group)
+        center_lon /= len(users_in_group)
+
+        return [center_lat, center_lon]
+
+    def get_member(self):
+        return db.session.execute(
+            text('SELECT sgu.joiningdate, u.* FROM studygroup_user sgu INNER JOIN User u ON sgu.user = u.id '
+                 'WHERE sgu.studygroup = :group_id'),
+            {"group_id": self.id}
+        ).fetchall()
 
 
 class StudygroupUser(db.Model):
@@ -111,6 +138,23 @@ class StudygroupUser(db.Model):
         self.studygroup = studygroup
         self.user = user
         self.joiningdate = joiningdate
+
+
+class JoinRequest(db.Model):
+    __name__ = 'joinrequests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    studygroup = db.Column(db.Integer, db.ForeignKey('studygroup.id'), nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    requestdate = db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone(TZ)))
+    message = db.Column(db.String(500), nullable=False, default="")
+
+    def __init__(self, studygroup, user, id=None, message="", requestdate=datetime.now(pytz.timezone(TZ))):
+        self.id = id
+        self.studygroup = studygroup
+        self.user = user
+        self.message = message
+        self.requestdate = requestdate
 
 
 def get_studygroups_of_user_for_dashboard(user):

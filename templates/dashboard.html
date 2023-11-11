@@ -1,27 +1,30 @@
 {% extends 'base.html' %}
+{% from 'macros.html' import show_flashed_messages %}
 
 {% block basecontent %}
     <div class="basicContainer">
+        {{ show_flashed_messages() }}
         {% if studygroups %}
             <h2>Meine Lerngruppen</h2>
             <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">
                 {% for group in studygroups %}
-                    <div class=" basicContainer studygroupContainer">
+                    <a href="{{ url_for('main.edit_group', group_id=group.id) }}" class=" basicContainer studygroupContainer">
                         <div class="studygroupDashboardHeader">
                             <div class="studygroupName">{{ group.name }}</div> <i class="bi bi-people"></i> {{ group.member_count }}
                         </div>
                         <div class="memberCount"></div>
                         <div class="studygroupDescription">{{ group.description }}</div>
-                    </div>
+                    </a>
                 {% endfor %}
             </div>
         {% endif %}
         <div class="basicContainer secondaryContainer">
             <div class="basicContainer secondaryContainer mb-3" id="mapToolbar">
-                <button class="btn btn-primary">Studierende</button>
-                <button class="btn btn-primary">Gruppen</button>
+                <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="getMap('students')">Studierende</button>
+                <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="getMap('groups')">Gruppen</button>
             </div>
-            {{ map | safe }}
+            <div id="mapContainer"></div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='js/dashboardFunctions.js') }}"></script>
 {% endblock %}

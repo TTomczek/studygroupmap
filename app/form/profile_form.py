@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, PasswordField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Email, Length, NumberRange, ValidationError
+
 from app.database import User
 
 
@@ -47,7 +48,7 @@ class ProfileForm(FlaskForm):
         if field.data == "":
             return
 
-        if len(field.data) < 8:
+        if 8 > len(field.data) > 72:
             raise ValidationError('Passwort muss zwischen 8 und 72 Zeichen lang sein')
 
     @staticmethod

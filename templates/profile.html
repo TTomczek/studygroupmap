@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from "_formhelper.html" import render_field %}
+{% from 'bootstrap5/form.html' import render_field %}
 
 {% block basecontent %}
     <div class="basicContainer">
@@ -16,132 +16,76 @@
         <form action="/profile" method="POST" class="needs-validation" novalidate>
             {{ form.csrf_token }}
             <div class="row">
-
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.username) }}
-{#                        <input type="text" name="username" id="username" placeholder="Nutzername" class="form-control" value="{{ user.username }}" required>#}
-{#                        <label for="username" class="required">Nutzername*</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.username, placeholder="Nutzername") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.password) }}
-{#                        <input type="password" name="password" id="password" placeholder="Passwort" class="form-control">#}
-{#                        <label for="password">Passwort</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.password, placeholder="Neues Passwort") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.password_repeat) }}
-{#                        <input type="password" name="password-repeat" id="password-repeat" placeholder="Passwort wiederholen" class="form-control">#}
-{#                        <label for="password-repeat">Passwort wiederholen</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.password_repeat, placeholder="Neues Passwort wiederholen") }}
                 </div>
             </div>
 
             <div class="row">
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.email) }}
-{#                        <input type="text" name="email" id="email" placeholder="max@mustermann.de" class="form-control" value="{{ user.email }}" required>#}
-{#                        <label for="email" class="required">E-Mail*</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.email, placeholder="E-Mail") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.firstname) }}
-{#                        <input type="text" name="firstname" id="firstname" placeholder="Max" class="form-control" value="{{ user.firstname }}">#}
-{#                        <label for="firstname">Vorname</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.firstname, placeholder="Vorname") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.lastname) }}
-{#                        <input type="text" name="lastname" id="lastname" placeholder="Mustermann" class="form-control" value="{{ user.lastname }}">#}
-{#                        <label for="lastname">Nachname</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.lastname, placeholder="Nachname") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.phone) }}
-{#                        <input type="text" name="phone" id="phone" placeholder="+49 123 3456567" class="form-control" value="{{ user.phone }}">#}
-{#                        <label for="phone">Telefon</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.phone, placeholder="Telefonnummer") }}
                 </div>
             </div>
 
             <div class="row">
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.courseofstudy) }}
-{#                        <input type="text" name="coursofstudy" id="coursofstudy" placeholder="B. Sc Angewandte Informatik" class="form-control" value="{{ user.courseofstudy }}">#}
-{#                        <label for="coursofstudy">Studiengang</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.courseofstudy, placeholder="Studiengang") }}
                 </div>
 
-                <div class="col mt-3 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.semester) }}
-{#                        <input type="number" name="semester" id="semester" placeholder="Semester" class="form-control" value="{{ user.semester }}">#}
-{#                        <label for="semester">Semester</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.semester, placeholder="Semester") }}
                 </div>
 
-                <div class="col mt-3 mb-1">
-                    <div class="form-floating">
-                        {{ render_field(form.studentnumber) }}
-{#                        <input type="text" name="studentnumber" id="studentnumber" placeholder="864258945" class="form-control" value="{{ user.studentnumber }}">#}
-{#                        <label for="studentnumber">Matrikelnummer</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.studentnumber, placeholder="Matrikelnummer") }}
                 </div>
             </div>
 
             <div class="row">
-                <div class="col mt-3 mb-1">
-                    <div class="form-floating">
-                        {{ render_field(form.street) }}
-{#                        <input type="text" name="street" id="street" placeholder="Musterstraße 10" class="form-control" value="{{ user.street }}">#}
-{#                        <label for="street">Straße</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.street, placeholder="Straße") }}
                 </div>
             </div>
 
             <div class="row">
-                <div class="col mt-1 mb-1">
-                    <div class="form-floating">
-                        {{ render_field(form.postcode) }}
-{#                        <input type="text" name="postcode" id="postcode" placeholder="02345" class="form-control" maxlength="5" value="{{ user.postcode }}">#}
-{#                        <label for="postcode">Postleitzahl</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.postcode, placeholder="Postleitzahl") }}
                 </div>
 
-                <div class="col mt-1 mb-1">
-                    <div class="form-floating">
-                        {{ render_field(form.city) }}
-{#                        <input type="text" name="city" id="city" placeholder="Musterdorf" class="form-control" value="{{ user.city }}">#}
-{#                        <label for="city">Stadt</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.city, placeholder="Stadt") }}
                 </div>
 
-                <div class="col mt-1 mb-3">
-                    <div class="form-floating">
-                        {{ render_field(form.country) }}
-{#                        <input type="text" name="country" id="country" placeholder="Deutschland" class="form-control" value="{{ user.country }}">#}
-{#                        <label for="country">Land</label>#}
-                    </div>
+                <div class="col">
+                    {{ render_field(form.country, placeholder="Land") }}
                 </div>
             </div>
-
 
             <div id="loginFormButtonBar">
                 <button type="submit" class="btn btn-primary">Bestätigen</button>
-                <a href="{{ url_for('main.profile') }}"><button type="button" class="btn btn-secondary">Verwerfen</button></a>
+                <a href="{{ url_for('main.profile') }}">
+                    <button type="button" class="btn btn-secondary">Verwerfen</button>
+                </a>
             </div>
         </form>
     </div>

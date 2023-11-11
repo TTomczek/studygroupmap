@@ -1,3 +1,7 @@
+a, a:visited, a:hover, a:active {
+  text-decoration: inherit;
+}
+
 .basicContainer {
     margin: 1rem;
     padding: 1.25rem;
@@ -13,7 +17,14 @@
 
 .basicLoginContainer {
     width: 20vw;
-    margin: 30vh auto auto;
+    margin: auto;
+}
+
+#loginContainerWrapper, #signupContainerWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 #loginFormButtonBar {
@@ -54,5 +65,48 @@
 #mapToolbar > button:not(:last-child) {
     margin-right: 0.5rem;
 }
+
+.userPopupToolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem
+}
+
+.groupMemberListContainer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+}
+
+.groupMemberContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--bs-primary);
+    padding: 1rem;
+}
+
+.groupMemberText {
+    color: white;
+}
+
+.groupMemberContainer form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.groupMemberContainer form input {
+    width: 100%;
+}
+
 
 

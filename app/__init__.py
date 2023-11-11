@@ -1,7 +1,9 @@
 import json
+from datetime import datetime
 from functools import partial
 
 from flask import Flask
+from flask_bootstrap import Bootstrap5
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from geopy import Photon
@@ -23,6 +25,7 @@ app = Flask(__name__,
             static_folder='../static',
             template_folder='../templates',
             static_url_path='')
+bootstrap = Bootstrap5(app)
 
 app.config.from_file('config.json', load=json.load)
 
@@ -53,3 +56,10 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.template_filter('datetime')
+def format_datetime(value, format="%d.%m.%Y %H:%M"):
+    if value is None:
+        return ""
+    return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f').strftime(format)
