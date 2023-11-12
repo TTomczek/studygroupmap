@@ -89,15 +89,15 @@ class Studygroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(500), nullable=False)
-    creator = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creation_time = db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone(TZ)))
     is_locked = db.Column(db.Boolean, nullable=False, default=False)
 
-    def __init__(self, id=None, name="", description="", creator=0):
+    def __init__(self, id=None, name="", description="", owner=0):
         self.id = id
         self.name = name
         self.description = description
-        self.creator = creator
+        self.owner = owner
 
     def get_group_location(self):
 

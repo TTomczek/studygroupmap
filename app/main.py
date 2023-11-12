@@ -132,7 +132,7 @@ def edit_group(group_id: int, group_form=None):
         return redirect(url_for('main.dashboard'))
 
     if group_form is None:
-        group_form = GroupForm(group=group)
+        group_form = GroupForm(group=group, current_user=current_user)
 
 
     return render_template('group.html', title='Gruppe bearbeiten', form=group_form,
@@ -143,7 +143,7 @@ def edit_group(group_id: int, group_form=None):
 @login_required
 def edit_group_post(group_id: int):
 
-    group_form = GroupForm(request.form)
+    group_form = GroupForm(request.form, current_user=current_user)
 
     if not group_form.validate():
         print(group_form.id.data)

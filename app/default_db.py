@@ -109,12 +109,12 @@ def init_db(db):
 
     if Studygroup.query.filter_by(name="AI Gruppe").first() is None:
         group1 = Studygroup(name="AI Gruppe", description="Gruppe zur Erforschung der Vernichtung der Menschheit")
-        group1.creator = 4
+        group1.owner = 4
         db.session.add(group1)
 
     if Studygroup.query.filter_by(name="Computer Gruppe").first() is None:
         group2 = Studygroup(name="Computer Gruppe", description="Wir mögen Computer")
-        group2.creator = 2
+        group2.owner = 2
         db.session.add(group2)
 
     db.session.commit()
