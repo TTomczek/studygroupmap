@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, TextAreaField, DateTimeLocalField
+from wtforms import StringField, HiddenField, TextAreaField, DateTimeLocalField, BooleanField
 from wtforms.validators import DataRequired, Length
 
 from app.database import User, Studygroup
@@ -11,6 +11,7 @@ class GroupForm(FlaskForm):
     description = TextAreaField('Beschreibung', validators=[Length(min=0, max=500, message='Beschreibung darf maximal 500 Zeichen lang sein')])
     owner = StringField('Besitzer', render_kw={"disabled": True, "readonly": True})
     creation_time = DateTimeLocalField('Erstellungszeitpunkt', render_kw={"disabled": True, "readonly": True})
+    is_locked = BooleanField('Beitrittsanfragen erlaubt')
 
     def __init__(self, form=None, *, group: Studygroup = None, current_user: User = None):
 
@@ -23,6 +24,7 @@ class GroupForm(FlaskForm):
         self.name.data = group.name
         self.description.data = group.description
         self.creation_time.data = group.creation_time
+        self.is_locked.data = group.is_locked
 
         owner_user = User.query.filter_by(id=group.owner).first()
         self.owner.id = owner_user.id
@@ -31,3 +33,4 @@ class GroupForm(FlaskForm):
         if current_user is not None and current_user.id != group.owner:
             self.name.render_kw = {"disabled": True, "readonly": True}
             self.description.render_kw = {"disabled": True, "readonly": True}
+            self.is_locked.render_kw = {"disabled": True, "readonly": True}

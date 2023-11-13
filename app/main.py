@@ -1,6 +1,8 @@
 from flask import Blueprint, url_for, redirect, render_template, request, flash
 from flask_login import login_required, current_user
 from folium import folium, Marker, Icon
+from sqlalchemy import or_
+from sqlalchemy.sql.operators import is_not
 
 from app import db
 from app.database import User, get_studygroups_of_user_for_dashboard, Studygroup, StudygroupUser
@@ -36,7 +38,8 @@ def dashboard():
 @login_required
 def dashboard_students():
 
-    users = User.query.all()
+    users = User.query.filter(or_(User.can_be_invited, User.id == current_user.id)).all()
+
     student_map = get_centered_map(current_user)
 
     for user in users:
@@ -59,14 +62,14 @@ def dashboard_students():
 @login_required
 def dashboard_groups():
 
-    groups = Studygroup.query.all()
+    group_ids_of_cu = [group.id for group in get_studygroups_of_user_for_dashboard(current_user)]
+    groups = Studygroup.query.filter(or_(is_not(Studygroup.is_locked, False), Studygroup.id.in_(group_ids_of_cu))).all()
     group_map = get_centered_map(current_user)
-    group_ids_of_current_user = [group.id for group in get_studygroups_of_user_for_dashboard(current_user)]
 
     for group in groups:
 
         color = "blue"
-        if group.id in group_ids_of_current_user:
+        if group.id in group_ids_of_cu:
             color = "green"
         (Marker(group.get_group_location(),
                popup=group.name,
@@ -111,6 +114,7 @@ def profile_post():
     user.postcode = form.postcode.data.strip()
     user.city = form.city.data.strip()
     user.country = form.country.data.strip()
+    user.can_be_invited = form.can_be_invited.data
 
     if form.password.data:
         user.password = User.hash_password(form.password.data)
@@ -152,6 +156,7 @@ def edit_group_post(group_id: int):
     group = Studygroup.query.filter_by(id=group_id).first()
     group.name = group_form.name.data.strip()
     group.description = group_form.description.data.strip()
+    group.is_locked = group_form.is_locked.data
     db.session.commit()
 
     flash("Gruppe erfolgreich aktualisiert.", "success")
@@ -162,13 +167,23 @@ def edit_group_post(group_id: int):
 @login_required
 def remove_group_member(group_id: int, user_id: int):
 
-    user_group = StudygroupUser.query.filter_by(studygroup=group_id, user=user_id).first()
+    user_group_to_remove = StudygroupUser.query.filter_by(studygroup=group_id, user=user_id).first()
 
-    if user_group is None:
+    if user_group_to_remove is None:
         flash("Benutzer nicht gefunden.", "danger")
         return edit_group(group_id)
 
-    StudygroupUser.query.filter_by(studygroup=group_id, user=user_id).delete()
+    group = Studygroup.query.filter_by(id=group_id).first()
+    if user_id == group.owner:
+        new_owner = StudygroupUser.query.filter_by(studygroup=group_id).filter(StudygroupUser.user != user_id).first()
+
+        if new_owner is None:
+            flash("Die Gruppe wurde aufgelöst.", "success")
+            db.session.delete(group)
+        else:
+            group.owner = new_owner.user
+
+    db.session.delete(user_group_to_remove)
     db.session.commit()
 
     if user_id == current_user.id:

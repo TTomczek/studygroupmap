@@ -32,6 +32,12 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-1 d-flex align-items-center">
+                    {{ render_field(form.is_locked) }}
+                </div>
+            </div>
+
             {% if current_user.id == form.owner.id %}
                 <div id="loginFormButtonBar">
                     <button type="submit" class="btn btn-primary">Bestätigen</button>
@@ -49,20 +55,26 @@
             <div class="basicContainer secondaryContainer groupMemberListContainer">
                 {% for user in member %}
                     <div class="basicContainer secondaryContainer groupMemberContainer">
-                        <div class="groupMemberText">{{ user.firstname }} {{ user.lastname }} ({{ user.username }}) Beigetreten am: {{ user.joiningdate | datetime }}</div>
+                        <div class="groupMemberText">{{ user.firstname }} {{ user.lastname }} ({{ user.username }})
+                            Beigetreten am: {{ user.joiningdate | datetime }}</div>
 
                         {% if user.id != current_user.id and current_user.id == form.owner.id %}
 
-                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST" class="removeUserFromGroupForm">
+                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
+                                  class="removeUserFromGroupForm">
                                 {{ form.csrf_token }}
-                                <input type="text" name="reason" id="reason" placeholder="Grund" class="form-control form-control-sm" required>
+                                <input type="text" name="reason" id="reason" placeholder="Grund"
+                                       class="form-control form-control-sm" required>
                                 <button type="submit" class="btn btn-danger btn-sm">Entfernen</button>
                             </form>
 
                         {% elif current_user.id == user.id %}
 
-                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST" class="removeUserFromGroupForm">
-                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmLeave(this)">Verlassen</button>
+                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
+                                  class="removeUserFromGroupForm">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmLeave(this)">
+                                    Verlassen
+                                </button>
                             </form>
 
                         {% endif %}

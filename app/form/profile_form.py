@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, PasswordField
+from wtforms import StringField, IntegerField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Email, Length, NumberRange, ValidationError
 
 from app.database import User
@@ -20,6 +20,7 @@ class ProfileForm(FlaskForm):
     postcode = StringField('Postleitzahl', validators=[Length(min=4, max=5, message='Postleitzahl muss zwischen 4 und 5 Zeichen lang sein')])
     city = StringField('Stadt', validators=[Length(min=3, max=50, message='Stadt muss zwischen 3 und 50 Zeichen lang sein')])
     country = StringField('Land', validators=[Length(min=3, max=50, message='Land muss zwischen 3 und 50 Zeichen lang sein')])
+    can_be_invited = BooleanField('Kann zu Gruppen eingeladen werden', validators=[])
 
     def __init__(self, form=None, *, user: User = None):
 
@@ -42,6 +43,7 @@ class ProfileForm(FlaskForm):
         self.postcode.data = user.postcode
         self.city.data = user.city
         self.country.data = user.country
+        self.can_be_invited.data = user.can_be_invited
 
     @staticmethod
     def validate_password(form, field):

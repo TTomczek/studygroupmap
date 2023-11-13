@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
     latitude = db.Column(db.Float, nullable=True, default=0.0)
     longitude = db.Column(db.Float, nullable=True, default=0.0)
     isFirstLogin = db.Column(db.Boolean, nullable=False, default=True)
-    canBeInvited = db.Column(db.Boolean, nullable=False, default=True)
+    can_be_invited = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self,
                  username,

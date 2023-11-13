@@ -35,6 +35,7 @@ def init_db(db):
         user2.isFirstLogin = False
         user2.latitude = 51.6093647
         user2.longitude = 7.5123653
+        user2.can_be_invited = False
         db.session.add(user2)
 
     if User.query.filter_by(username="user3").first() is None:
@@ -110,6 +111,7 @@ def init_db(db):
     if Studygroup.query.filter_by(name="AI Gruppe").first() is None:
         group1 = Studygroup(name="AI Gruppe", description="Gruppe zur Erforschung der Vernichtung der Menschheit")
         group1.owner = 4
+        group1.is_locked = True
         db.session.add(group1)
 
     if Studygroup.query.filter_by(name="Computer Gruppe").first() is None:
