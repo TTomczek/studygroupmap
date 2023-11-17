@@ -66,15 +66,7 @@ a, a:visited, a:hover, a:active {
     margin-right: 0.5rem;
 }
 
-.userPopupToolbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem
-}
-
-.groupMemberListContainer {
+.listContainer {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -92,7 +84,7 @@ a, a:visited, a:hover, a:active {
     padding: 1rem;
 }
 
-.groupMemberText {
+.white-text {
     color: white;
 }
 
@@ -108,5 +100,14 @@ a, a:visited, a:hover, a:active {
     width: 100%;
 }
 
+#navbarUsername::before {
+    content: "\A";
+}
 
+.userPopup {
+    font-size: small;
+}
 
+.popupAboutMeContainer {
+    width: 40vw
+}

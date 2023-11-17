@@ -1,8 +1,7 @@
-from .database import User, Studygroup, StudygroupUser, JoinRequest
+from .database import User, Studygroup, StudygroupUser, JoinRequest, Message, MessageType
 
 
 def init_db(db):
-
     if User.query.filter_by(username="user1").first() is None:
         user1 = User(username="user1", email="user1@user1.mail", password=User.hash_password("user1"))
         user1.firstname = "Achim"
@@ -53,6 +52,19 @@ def init_db(db):
         user3.isFirstLogin = False
         user3.latitude = 51.5001804
         user3.longitude = 7.6162948
+        user3.about_me = '''
+            Hallo! Ich bin Max, ein aufgeschlossener Student im zweiten Semester. 🎓
+    
+            In meiner Freizeit liebe ich es, mich mit Technologie und Programmierung zu beschäftigen. Als Informatikstudent habe ich bereits einige spannende Projekte umgesetzt, darunter eine Webanwendung zur Verwaltung von Aufgaben und eine App zur Erkennung von Pflanzenarten.
+            
+            Meine Leidenschaft für das Lernen und die Neugierde auf neue Herausforderungen treiben mich an. Ich bin stets bestrebt, mein Wissen zu erweitern und mich persönlich weiterzuentwickeln.
+            
+            Neben dem Studium engagiere ich mich in der Hochschulgruppe für künstliche Intelligenz und bin Teil des Organisationsteams für Hackathons. Hier kann ich meine Fähigkeiten in der Teamarbeit und im Projektmanagement unter Beweis stellen.
+            
+            In meiner Zukunft sehe ich mich als Softwareentwickler, der innovative Lösungen für reale Probleme entwickelt. Obwohl ich noch viel zu lernen habe, bin ich zuversichtlich, dass ich meinen Weg gehen werde.
+            
+            Wenn du Fragen hast oder dich für meine Projekte interessierst, zögere nicht, mich anzusprechen! Ich freue mich darauf, dich kennenzulernen. 😊
+        '''
         db.session.add(user3)
 
     if User.query.filter_by(username="user4").first() is None:
@@ -111,22 +123,24 @@ def init_db(db):
     if Studygroup.query.filter_by(name="AI Gruppe").first() is None:
         group1 = Studygroup(name="AI Gruppe", description="Gruppe zur Erforschung der Vernichtung der Menschheit")
         group1.owner = 4
-        group1.is_locked = True
         db.session.add(group1)
 
     if Studygroup.query.filter_by(name="Computer Gruppe").first() is None:
         group2 = Studygroup(name="Computer Gruppe", description="Wir mögen Computer")
         group2.owner = 2
+        group2.is_open = False
         db.session.add(group2)
 
     db.session.commit()
 
     StudygroupUser.query.delete()
+    # AI Gruppe
     group41 = StudygroupUser(user=4, studygroup=1)
     group51 = StudygroupUser(user=5, studygroup=1)
     db.session.add(group41)
     db.session.add(group51)
 
+    # Computer Gruppe
     group12 = StudygroupUser(user=1, studygroup=2)
     group22 = StudygroupUser(user=2, studygroup=2)
     group32 = StudygroupUser(user=3, studygroup=2)
@@ -138,7 +152,22 @@ def init_db(db):
 
     db.session.commit()
 
-    if JoinRequest.query.filter_by(user=6, studygroup=1).first() is None:
-        join_request = JoinRequest(user=6, studygroup=1, message="Ich will auch AI studieren!")
+    MessageType.query.delete()
+    message_type2 = MessageType(name="feed", description="Nachricht für den Feed")
+    message_type1 = MessageType(name="message", description="Nachricht unter Nutzern")
+    db.session.add(message_type2)
+    db.session.add(message_type1)
+
+    db.session.commit()
+
+    if JoinRequest.query.filter_by(invited_user=6, studygroup=1).first() is None:
+        join_request = JoinRequest(invited_user_id=6, studygroup_id=1, invited_by_id=5, message="Du sollst auch AI studieren!")
         db.session.add(join_request)
-        db.session.commit()
+
+    if JoinRequest.query.filter_by(invited_user=1, studygroup=1).first() is None:
+        join_request = JoinRequest(invited_user_id=1, studygroup_id=1, message="LET ME IN!")
+        db.session.add(join_request)
+
+    db.session.commit()
+
+

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import show_flashed_messages %}
+{% from 'bootstrap5/form.html' import render_field %}
+
+
+{% block basecontent %}
+    <div class="basicContainer">
+
+        <h1>{{ invited_user_name }} zu Gruppe einladen</h1>
+        {{ show_flashed_messages() }}
+
+        <form action="/group/join" method="post" class="needs-validation" novalidate>
+            {{ form.csrf_token }}
+            {{ render_field(form.invited_user) }}
+            <div class="row">
+
+                <div class="col-3">
+                    {{ render_field(form.group) }}
+                </div>
+
+                <div class="col">
+                    {{ render_field(form.message) }}
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary">Einladen</button>
+            <a href="{{ url_for('main.dashboard') }}">
+                <button type="button" class="btn btn-secondary">Abbrechen</button>
+            </a>
+        </form>
+
+    </div>
+{% endblock %}

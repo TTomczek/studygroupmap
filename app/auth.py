@@ -22,10 +22,9 @@ def login_post():
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return render_template('login.html', title='Login',
-                               message='Benutzername oder Passwort falsch.')
+        flash('Benutzername oder Passwort falsch.', 'danger')
+        return render_template('login.html', title='Login')
 
-    pepper = app.config['PEPPER']
     if not User.check_password(password, user.password):
         flash('Benutzername oder Passwort falsch.', 'danger')
         return render_template('login.html', title='Login')

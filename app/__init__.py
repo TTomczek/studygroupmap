@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from functools import partial
 
+import pytz
 from flask import Flask
 from flask_bootstrap import Bootstrap5
 from flask_login import LoginManager
@@ -29,6 +30,8 @@ bootstrap = Bootstrap5(app)
 
 app.config.from_file('config.json', load=json.load)
 
+APP_TZ = pytz.timezone(app.config['TIMEZONE'])
+
 geocode = get_geocode()
 
 
@@ -45,7 +48,7 @@ with app.app_context():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .database import User, Studygroup, StudygroupUser
+    from .database import *
     db.create_all()
     db.session.commit()
 

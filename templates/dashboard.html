@@ -1,9 +1,31 @@
 {% extends 'base.html' %}
 {% from 'macros.html' import show_flashed_messages %}
 
+{{ navbar_user(current_user) }}
+
 {% block basecontent %}
     <div class="basicContainer">
         {{ show_flashed_messages() }}
+
+        {% if join_requests %}
+            <h2>Offene Beitrittsanfragen</h2>
+            <div class="basicContainer secondaryContainer listContainer mb-3">
+                {% for join_request in join_requests %}
+                    <div class="basicContainer secondaryContainer groupMemberContainer">
+                        <div class="white-text">{{ join_request.invited_by.firstname }} {{ join_request.invited_by.lastname }} möchte dich in die Gruppe {{ join_request.group.name }} einladen.</div>
+                        <div>
+                            <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=1) }}">
+                                <button type="submit" class="btn btn-success">Annehmen</button>
+                            </a>
+                            <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=0) }}">
+                                <button type="submit" class="btn btn-danger">Ablehnen</button>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% if studygroups %}
             <h2>Meine Lerngruppen</h2>
             <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">

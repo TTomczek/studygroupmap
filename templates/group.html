@@ -9,6 +9,35 @@
 
         {{ show_flashed_messages() }}
 
+        {% if join_requests %}
+                <h2 class="mt-3">Beitrittsanfragen</h2>
+                <div class="basicContainer secondaryContainer listContainer mb-3">
+                    {% for join_request in join_requests %}
+                        {% if join_request.invited %}
+                            <div class="basicContainer secondaryContainer groupMemberContainer white-text">
+                                {{ join_request.invited_user.firstname }} {{ join_request.invited_user.lastname }} wurde von
+                                {{ join_request.invited_by.firstname }} {{ join_request.invited_by.lastname }} eingeladen.
+                            </div>
+                        {% else %}
+                            <div class="basicContainer secondaryContainer groupMemberContainer white-text">
+                                {{ join_request.invited_user.firstname }} {{ join_request.invited_user.lastname }} möchte der Gruppe beitreten.
+                                <div>{{ join_request.request.message }}</div>
+                                {% if current_user.id == form.owner.data %}
+                                    <div>
+                                        <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=1) }}">
+                                            <button type="submit" class="btn btn-success">Annehmen</button>
+                                        </a>
+                                        <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=0) }}">
+                                            <button type="submit" class="btn btn-danger">Ablehnen</button>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
         <form action="/group/{{ form.id.data }}" method="POST" class="needs-validation" novalidate>
             {{ form.csrf_token }}
             {{ render_field(form.id) }}
@@ -34,11 +63,11 @@
 
             <div class="row">
                 <div class="col-1 d-flex align-items-center">
-                    {{ render_field(form.is_locked) }}
+                    {{ render_field(form.is_open) }}
                 </div>
             </div>
 
-            {% if current_user.id == form.owner.id %}
+            {% if current_user.id == form.owner.data %}
                 <div id="loginFormButtonBar">
                     <button type="submit" class="btn btn-primary">Bestätigen</button>
                     <a href="/group/{{ form.id.data }}">
@@ -52,13 +81,13 @@
 
             <h2 class="mt-3">Mitglieder</h2>
 
-            <div class="basicContainer secondaryContainer groupMemberListContainer">
+            <div class="basicContainer secondaryContainer listContainer">
                 {% for user in member %}
                     <div class="basicContainer secondaryContainer groupMemberContainer">
-                        <div class="groupMemberText">{{ user.firstname }} {{ user.lastname }} ({{ user.username }})
+                        <div class="white-text">{{ user.firstname }} {{ user.lastname }}
                             Beigetreten am: {{ user.joiningdate | datetime }}</div>
 
-                        {% if user.id != current_user.id and current_user.id == form.owner.id %}
+                        {% if user.id != current_user.id and current_user.id == form.owner.data %}
 
                             <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
                                   class="removeUserFromGroupForm">

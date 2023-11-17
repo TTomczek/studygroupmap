@@ -16,7 +16,7 @@ function getMap(type) {
         document.getElementById('mapToolbarBtnGroups').disabled = true;
     }
 
-    fetch('/dashboard/' + type)
+    fetch('/dashboard/map/' + type)
     .then(response => response.text())
     .then(data => {
         const mapContainer = document.getElementById('mapContainer');

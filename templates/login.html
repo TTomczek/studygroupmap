@@ -1,18 +1,11 @@
 {% extends 'scaffold.html' %}
+{% from 'macros.html' import show_flashed_messages %}
 
 {% block content %}
     <div id="loginContainerWrapper">
         <div class="basicContainer basicLoginContainer">
             <h1>Login</h1>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+            {{ show_flashed_messages() }}
             <form action="/login" method="post" autocomplete="on">
                 <label for="username" class="form-label">Nutzername</label>
                 <input type="text" name="username" id="username" placeholder="Nutzername" class="form-control">

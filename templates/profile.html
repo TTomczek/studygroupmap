@@ -1,18 +1,11 @@
 {% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_field %}
+{% from 'macros.html' import show_flashed_messages %}
 
 {% block basecontent %}
     <div class="basicContainer">
         <h1>Profil Bearbeiten</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        {{ show_flashed_messages() }}
         <form action="/profile" method="POST" class="needs-validation" novalidate>
             {{ form.csrf_token }}
             <div class="row">
@@ -84,6 +77,12 @@
             <div class="row">
                 <div class="col-2 d-flex align-items-center">
                     {{ render_field(form.can_be_invited) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {{ render_field(form.about_me, placeholder="Schreibe etwas über dich") }}
                 </div>
             </div>
 
