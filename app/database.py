@@ -47,7 +47,9 @@ class User(UserMixin, db.Model):
         return self.id == other.id
 
     def update_location(self):
-        location = geocode(self.street + ", " + self.postcode + " " + self.city + ", " + self.country)
+        city_postcode = ' '.join([self.postcode, self.city])
+        location_string = ','.join([self.street, city_postcode, self.country])
+        location = geocode(location_string)
         if location is not None:
             self.latitude = location.latitude
             self.longitude = location.longitude
@@ -249,7 +251,6 @@ class JoinRequestPresentation:
         if self.request.invited_by is not None:
             self.invited = True
             self.invited_by = User.query.filter_by(id=request.invited_by).first()
-
 
 
 def get_join_requests_for_group(group_id: int):

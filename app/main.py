@@ -403,7 +403,8 @@ def __check_address_changed(user: User, form: ProfileForm):
 def __get_centered_map(user, inital_zoom_level=10):
 
     if user.latitude == 0 or user.longitude == 0:
-        folium_map = folium.Map(location=[51.5, 10], zoom_start=inital_zoom_level, scrollWheelZoom=False, height='1000px')
+        flash("Der Standort konnte nicht ermittelt werden.", "warning")
+        folium_map = folium.Map(location=[51.5, 10], zoom_start=inital_zoom_level, scrollWheelZoom=False)
     else:
         folium_map = folium.Map(location=[user.latitude, user.longitude], zoom_start=inital_zoom_level, scrollWheelZoom=False)
 

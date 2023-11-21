@@ -1,24 +1,28 @@
 import json
-from datetime import datetime
+import ssl
 from functools import partial
 
+import certifi
+import geopy
 import pytz
 from flask import Flask
 from flask_bootstrap import Bootstrap5
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from geopy import Photon
+from geopy import Nominatim
 from geopy.exc import GeocoderUnavailable
 from geopy.extra.rate_limiter import RateLimiter
+
+geopy.geocoders.options.default_ssl_context = ctx = ssl.create_default_context(cafile=certifi.where())
 
 
 def get_geocode():
     try:
-        geolocator = Photon(user_agent="LerngruppenKarte", scheme="http")
+        geolocator = Nominatim(user_agent="LerngruppenKarte", scheme="https")
         geocode_de = partial(geolocator.geocode, language="de")
-        return RateLimiter(geocode_de, min_delay_seconds=3)
+        return RateLimiter(geocode_de, min_delay_seconds=3, max_retries=1, error_wait_seconds=5)
     except GeocoderUnavailable as e:
-        print("Cannot update location. Geocoder is unavailable.", e)
+        app.logger.warning("Cannot update location. Geocoder is unavailable.", e)
 
 
 db = SQLAlchemy()
