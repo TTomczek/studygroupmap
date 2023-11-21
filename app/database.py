@@ -4,7 +4,8 @@ import bcrypt
 from flask_login import UserMixin
 from sqlalchemy import text
 
-from app import db, app, geocode, APP_TZ
+from app import db, app, APP_TZ
+from app.geocoding import get_coordinates
 
 
 class User(UserMixin, db.Model):
@@ -47,13 +48,21 @@ class User(UserMixin, db.Model):
         return self.id == other.id
 
     def update_location(self):
+
         city_postcode = ' '.join([self.postcode, self.city])
         location_string = ','.join([self.street, city_postcode, self.country])
-        location = geocode(location_string)
-        if location is not None:
-            self.latitude = location.latitude
-            self.longitude = location.longitude
+
+        latitude, longitude = get_coordinates(location_string)
+
+        if latitude is not None and longitude is not None:
+
+            self.latitude = latitude
+            self.longitude = longitude
             db.session.commit()
+        else:
+
+            app.logger.warning("Cannot update location")
+
 
     @staticmethod
     def get_studygroups_of_user_for_dashboard(user):
