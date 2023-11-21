@@ -26,20 +26,21 @@
             </div>
         {% endif %}
 
+        <div class="d-flex justify-content-between"><h2>Meine Lerngruppen</h2><a href="{{ url_for('main.create_group') }}"><button type="button" class="btn btn-primary">Neue Gruppe erstellen</button></a></div>
+        <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">
         {% if studygroups %}
-            <h2>Meine Lerngruppen</h2>
-            <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">
-                {% for group in studygroups %}
-                    <a href="{{ url_for('main.edit_group', group_id=group.id) }}" class=" basicContainer studygroupContainer">
-                        <div class="studygroupDashboardHeader">
-                            <div class="studygroupName">{{ group.name }}</div> <i class="bi bi-people"></i> {{ group.member_count }}
-                        </div>
-                        <div class="memberCount"></div>
-                        <div class="studygroupDescription">{{ group.description }}</div>
-                    </a>
-                {% endfor %}
-            </div>
+            {% for group in studygroups %}
+                <a href="{{ url_for('main.edit_group', group_id=group.id) }}" class=" basicContainer studygroupContainer">
+                    <div class="studygroupDashboardHeader">
+                        <div class="studygroupName">{{ group.name }}</div> <i class="bi bi-people"></i> {{ group.member_count }}
+                    </div>
+                    <div class="memberCount"></div>
+                    <div class="studygroupDescription">{{ group.description }}</div>
+                </a>
+            {% endfor %}
         {% endif %}
+        </div>
+        <h2>Karte</h2>
         <div class="basicContainer secondaryContainer">
             <div class="basicContainer secondaryContainer mb-3" id="mapToolbar">
                 <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="getMap('students')">Studierende</button>

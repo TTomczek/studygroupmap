@@ -1,9 +1,8 @@
 from datetime import datetime
 
 import bcrypt
-import pytz
 from flask_login import UserMixin
-from sqlalchemy import text, and_
+from sqlalchemy import text
 
 from app import db, app, geocode, APP_TZ
 
@@ -57,7 +56,7 @@ class User(UserMixin, db.Model):
     @staticmethod
     def get_studygroups_of_user_for_dashboard(user):
         studygroups = db.session.execute(
-            text("SELECT sg.*, count(sgu.user) as member_count FROM Studygroup sg "
+            text("SELECT sg.*, count(sgu.user) as member_count FROM Study_group sg "
                  "INNER JOIN studygroup_user sgu ON sg.id = sgu.studygroup "
                  "WHERE sg.id IN (SELECT DISTINCT sgu1.studygroup FROM studygroup_user sgu1 WHERE sgu1.user = :user)"
                  "GROUP BY sg.id;"), {"user": user.id}).fetchall()
@@ -87,7 +86,7 @@ class User(UserMixin, db.Model):
         return bcrypt.checkpw(hash_with_pepper, hashed_password_bytes)
 
 
-class Studygroup(db.Model):
+class StudyGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(500), nullable=False)
@@ -125,10 +124,16 @@ class Studygroup(db.Model):
             {"group_id": self.id}
         ).fetchall()
 
+    def get_member_count(self):
+        return StudygroupUser.query.filter_by(studygroup=self.id).count()
+
+    def get_owner_user(self):
+        return User.query.filter_by(id=self.owner).first()
+
 
 class StudygroupUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    studygroup = db.Column(db.Integer, db.ForeignKey('studygroup.id'), nullable=False)
+    studygroup = db.Column(db.Integer, db.ForeignKey('study_group.id'), nullable=False)
     user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     joiningdate = db.Column(db.DateTime, nullable=False, default=datetime.now(APP_TZ))
 
@@ -145,7 +150,7 @@ class StudygroupUser(db.Model):
 
 class JoinRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    studygroup = db.Column(db.Integer, db.ForeignKey('studygroup.id'), nullable=False)
+    studygroup = db.Column(db.Integer, db.ForeignKey('study_group.id'), nullable=False)
     invited_user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     invited_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     requestdate = db.Column(db.DateTime, nullable=False, default=datetime.now(APP_TZ))
@@ -232,18 +237,19 @@ class Message(db.Model):
 class JoinRequestPresentation:
     request: JoinRequest
     invited_user: User
-    invited_by: User
-    group: Studygroup
+    invited_by: User = None
+    group: StudyGroup
     invited: bool = False
 
     def __init__(self, request: JoinRequest):
         self.request = request
         self.invited_user = User.query.filter_by(id=request.invited_user).first()
-        self.group = Studygroup.query.filter_by(id=request.studygroup).first()
+        self.group = StudyGroup.query.filter_by(id=request.studygroup).first()
 
         if self.request.invited_by is not None:
             self.invited = True
             self.invited_by = User.query.filter_by(id=request.invited_by).first()
+
 
 
 def get_join_requests_for_group(group_id: int):
@@ -261,7 +267,8 @@ def get_join_requests_for_group(group_id: int):
 def get_invitations_for_user(user_id: int):
 
     # Normalerweise werden Vergleiche mit None mit einem is gemacht, aber das funktioniert bei SqlAlchemy nicht.
-    raw_join_requests = JoinRequest.query.filter(JoinRequest.accepted == None, JoinRequest.invited_user == user_id).all()
+    raw_join_requests = JoinRequest.query.filter(JoinRequest.accepted == None, JoinRequest.invited_user == user_id,
+                                                 JoinRequest.invited_by != None).all()
 
     join_requests = []
     for raw_join_request in raw_join_requests:

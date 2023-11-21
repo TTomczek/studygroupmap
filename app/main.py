@@ -6,11 +6,12 @@ from sqlalchemy import or_
 from sqlalchemy.sql.operators import is_not
 
 from app import db
-from app.database import User, Studygroup, StudygroupUser, Message, JoinRequest, get_join_requests_for_group, \
+from app.database import User, StudyGroup, StudygroupUser, Message, JoinRequest, get_join_requests_for_group, \
     get_invitations_for_user
-from app.form.AddToGroupForm import AddToGroupForm
-from app.form.GroupForm import GroupForm
-from app.form.ProfileForm import ProfileForm
+from app.form.groupform import GroupForm
+from app.form.groupinviteform import AddToGroupForm
+from app.form.groupjoinrequest import GroupJoinRequest
+from app.form.profileform import ProfileForm
 
 main = Blueprint('main', __name__)
 
@@ -27,13 +28,10 @@ def dashboard():
         flash("Bitte vervollständige dein Profil.", "warning")
         return redirect(url_for('main.profile'))
 
-    dashboard_map = __get_centered_map(current_user)
-
     return render_template('dashboard.html',
                            title='Dashboard',
                            current_user=current_user,
                            studygroups=User.get_studygroups_of_user_for_dashboard(current_user),
-                           map=dashboard_map.get_root()._repr_html_(),
                            join_requests=get_invitations_for_user(current_user.id))
 
 
@@ -64,7 +62,7 @@ def dashboard_students():
 @login_required
 def dashboard_groups():
     group_ids_of_cu = [group.id for group in User.get_studygroups_of_user_for_dashboard(current_user)]
-    groups = Studygroup.query.filter(or_(is_not(Studygroup.is_open, False), Studygroup.id.in_(group_ids_of_cu))).all()
+    groups = StudyGroup.query.filter(or_(is_not(StudyGroup.is_open, False), StudyGroup.id.in_(group_ids_of_cu))).all()
     group_map = __get_centered_map(current_user)
 
     for group in groups:
@@ -73,7 +71,7 @@ def dashboard_groups():
         if group.id in group_ids_of_cu:
             color = "green"
         (Marker(group.get_group_location(),
-                popup=group.name,
+                popup=__get_group_popup(group),
                 icon=Icon(icon="people-group", color=color, prefix="fa", icon_color="white"))
          .add_to(group_map))
 
@@ -127,7 +125,8 @@ def profile_post():
 @main.route('/group/<int:group_id>')
 @login_required
 def edit_group(group_id: int, group_form=None):
-    group = Studygroup.query.filter_by(id=group_id).first()
+
+    group = StudyGroup.query.filter_by(id=group_id).first()
     member = group.get_member()
 
     if current_user.id not in [user.id for user in member]:
@@ -139,14 +138,15 @@ def edit_group(group_id: int, group_form=None):
     if group_form is None:
         group_form = GroupForm(group=group, current_user=current_user, owner_options=owner_options)
 
-    return render_template('group.html', title='Gruppe bearbeiten', form=group_form,
-                           member=member, current_user=current_user, join_requests=get_join_requests_for_group(group_id))
+    return render_template('group.html', title='Gruppe bearbeiten', form=group_form, member=member,
+                           current_user=current_user, join_requests=get_join_requests_for_group(group_id),
+                           submit_endpoint=url_for('main.edit_group_post', group_id=group_id))
 
 
 @main.route('/group/<int:group_id>', methods=['POST'])
 @login_required
 def edit_group_post(group_id: int):
-    group = Studygroup.query.filter_by(id=group_id).first()
+    group = StudyGroup.query.filter_by(id=group_id).first()
     member = group.get_member()
     owner_options = [(user.id, user.firstname + " " + user.lastname) for user in member]
     group_form = GroupForm(request.form, current_user=current_user, owner_options=owner_options)
@@ -154,7 +154,7 @@ def edit_group_post(group_id: int):
     if not group_form.validate():
         return edit_group(group_id, group_form)
 
-    group = Studygroup.query.filter_by(id=group_id).first()
+    group = StudyGroup.query.filter_by(id=group_id).first()
     group.name = group_form.name.data.strip()
     group.description = group_form.description.data.strip()
     group.is_open = group_form.is_open.data
@@ -162,7 +162,8 @@ def edit_group_post(group_id: int):
     db.session.commit()
 
     flash("Gruppe erfolgreich aktualisiert.", "success")
-    return redirect(url_for('main.edit_group', group_id=group_id))
+    return redirect(url_for('main.edit_group', group_id=group_id,
+                            submit_endpoint=url_for('main.edit_group_post', group_id=group_id)))
 
 
 @main.route('/group/<int:group_id>/member/<int:user_id>', methods=['POST'])
@@ -174,7 +175,7 @@ def remove_group_member(group_id: int, user_id: int):
         flash("Benutzer nicht gefunden.", "danger")
         return edit_group(group_id)
 
-    group = Studygroup.query.filter_by(id=group_id).first()
+    group = StudyGroup.query.filter_by(id=group_id).first()
     if user_id == group.owner:
         new_owner = StudygroupUser.query.filter_by(studygroup=group_id).filter(StudygroupUser.user != user_id).first()
 
@@ -197,6 +198,43 @@ def remove_group_member(group_id: int, user_id: int):
     return edit_group(group_id)
 
 
+@main.route('/group/create')
+@login_required
+def create_group():
+
+    group = StudyGroup(name="Neue Gruppe")
+    group.is_open = True
+    group.owner = current_user.id
+
+    owner_options = [(current_user.id, current_user.firstname + " " + current_user.lastname)]
+    form = GroupForm(current_user=current_user, group=group, owner_options=owner_options)
+    return render_template('group.html', title='Gruppe erstellen', form=form,
+                           submit_endpoint=url_for('main.create_group_post'))
+
+
+@main.route('/group/create', methods=['POST'])
+@login_required
+def create_group_post():
+
+    owner_options = [(current_user.id, current_user.firstname + " " + current_user.lastname)]
+    form = GroupForm(request.form, current_user=current_user, owner_options=owner_options)
+
+    if not form.validate():
+        return render_template('group.html', title='Gruppe erstellen', form=form)
+
+    group = StudyGroup(name=form.name.data.strip(), description=form.description.data.strip(), owner=form.owner.data)
+    group.is_open = form.is_open.data
+    db.session.add(group)
+    db.session.commit()
+
+    studygroup_user = StudygroupUser(studygroup=group.id, user=current_user.id)
+    db.session.add(studygroup_user)
+    db.session.commit()
+
+    flash("Gruppe erfolgreich erstellt.", "success")
+    return redirect(url_for('main.edit_group', group_id=group.id))
+
+
 @main.route('/group/join/<int:invited_user_id>', methods=['GET'])
 @login_required
 def join(invited_user_id: int):
@@ -204,7 +242,7 @@ def join(invited_user_id: int):
     groups_of_current_user = StudygroupUser.get_groups_ids_of_useer(current_user.id)
     groups_of_invited_user = StudygroupUser.get_groups_ids_of_useer(invited_user_id)
     possible_group_ids = [x.id for x in groups_of_current_user if x not in groups_of_invited_user]
-    possible_groups = Studygroup.query.filter(Studygroup.id.in_(possible_group_ids)).all()
+    possible_groups = StudyGroup.query.filter(StudyGroup.id.in_(possible_group_ids)).all()
     group_choices = [(group.id, group.name) for group in possible_groups]
 
     invited_user = User.query.filter_by(id=invited_user_id).first()
@@ -212,7 +250,7 @@ def join(invited_user_id: int):
 
     form = AddToGroupForm(group_choices=group_choices)
     form.invited_user.data = invited_user_id
-    return render_template('joinrequest.html', title="Nutzer zu Gruppe einladen", form=form,
+    return render_template('groupinvitation.html', title="Nutzer zu Gruppe einladen", form=form,
                            group_choices=group_choices, invited_user_name=invited_user_name)
 
 
@@ -222,7 +260,7 @@ def join_post():
 
     form = AddToGroupForm(request.form, group_choices=[])
 
-    if JoinRequest.query.filter_by(studygroup=form.group.data, invited_user=form.invited_user.data).first() is not None:
+    if JoinRequest.query.filter_by(studygroup=form.group.data, invited_user=form.invited_user.data, accepted=None).first() is not None:
         flash("Der Benutzer wurde bereits zu dieser Gruppe eingeladen.", "danger")
         return redirect(url_for('main.dashboard'))
 
@@ -244,7 +282,7 @@ def answer_group_join_request(join_request_id: int, accepted: int):
         flash("Einladung nicht gefunden.", "danger")
         return redirect(url_for('main.dashboard'))
 
-    group = Studygroup.query.filter_by(id=join_request.studygroup).first()
+    group = StudyGroup.query.filter_by(id=join_request.studygroup).first()
 
     if group is None:
         flash("Gruppe nicht gefunden.", "danger")
@@ -265,14 +303,59 @@ def answer_group_join_request(join_request_id: int, accepted: int):
             flash("Du bist nicht berechtigt diese Anfrage zu beantworten.", "danger")
             return redirect(url_for('main.dashboard'))
 
-
     if accepted == 1:
         return __accept_join_request(join_request, group, is_invitation)
     else:
-        return __decline_join_request(join_request, group, is_invitation)
+        return __decline_join_request(join_request, is_invitation)
 
 
-def __accept_join_request(join_request: JoinRequest, group: Studygroup, is_invitation: bool):
+@main.route('/group/join/request/<int:group_id>')
+@login_required
+def group_join_request(group_id: int):
+
+    group = StudyGroup.query.filter_by(id=group_id).first()
+
+    if group is None:
+        flash("Gruppe nicht gefunden.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    if not group.is_open:
+        flash("Du kannst der Gruppe momentan nicht beitreten.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    if StudygroupUser.query.filter_by(studygroup=group_id, user=current_user.id).first() is not None:
+        flash("Du bist bereits in der Gruppe.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    if JoinRequest.query.filter_by(studygroup=group_id, invited_user=current_user.id, accepted=None).first() is not None:
+        flash("Du hast einen Beitritt zu dieser Gruppe bereits angefragt oder wurdest zu ihr bereits eingeladen.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    form = GroupJoinRequest(group_id=group.id)
+
+    return render_template('groupjoinrequest.html', form=form, group=group, title="Gruppenbeitritt anfragen")
+
+
+@main.route('/group/join/request/<int:group_id>', methods=['POST'])
+@login_required
+def group_join_request_post(group_id: int):
+
+    form = GroupJoinRequest(request.form, group_id=group_id)
+
+    if JoinRequest.query.filter_by(studygroup=group_id, invited_user=current_user.id, accepted=None).first() is not None:
+        flash("Du hast einen Beitritt zu dieser Gruppe bereits angefragt oder wurdest zu ihr bereits eingeladen.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    join_request = JoinRequest(studygroup_id=group_id, invited_user_id=current_user.id,
+                               invited_by_id=None, message=form.message.data.strip())
+    db.session.add(join_request)
+    db.session.commit()
+
+    flash("Beitrittsanfrage erfolgreich versendet.", "success")
+    return redirect(url_for('main.dashboard'))
+
+
+def __accept_join_request(join_request: JoinRequest, group: StudyGroup, is_invitation: bool):
 
     if StudygroupUser.query.filter_by(studygroup=join_request.studygroup, user=join_request.invited_user).first() is not None:
 
@@ -299,7 +382,7 @@ def __accept_join_request(join_request: JoinRequest, group: Studygroup, is_invit
     return redirect(url_for('main.edit_group', group_id=group.id))
 
 
-def __decline_join_request(join_request: JoinRequest, group: Studygroup, is_invitation: bool):
+def __decline_join_request(join_request: JoinRequest, is_invitation: bool):
     join_request.accepted = False
     db.session.commit()
 
@@ -309,7 +392,7 @@ def __decline_join_request(join_request: JoinRequest, group: Studygroup, is_invi
     else:
 
         flash("Die Anfrage wurde abgelehnt.", "success")
-    return redirect(url_for('main.edit_group', group_id=group.id))
+    return redirect(url_for('main.dashboard'))
 
 
 def __check_address_changed(user: User, form: ProfileForm):
@@ -342,3 +425,23 @@ def __get_student_popup(user: User):
         </div>
     </div>
     '''.format(user.firstname, user.lastname, user.courseofstudy, user.semester, user.about_me, user.id)
+
+
+def __get_group_popup(group: StudyGroup):
+
+    group_owner_user = group.get_owner_user()
+    group_owner_name = group_owner_user.firstname + " " + group_owner_user.lastname
+
+    return '''
+    <div class="groupPopup">
+        <div>Name: {0}</div>
+        <div>Mitglieder: {1}</div>
+        <div>Besitzer: {2}</div>
+        <div>Beschreibung: {3}</div>
+        <div class="d-flex flex-column flex-space-around gap-1 mt-1">
+            <a href="/group/join/request/{4}" target="_parent">
+                <button class="btn btn-primary" type="button">Beitritt anfragen</button>
+            </a>
+        </div>
+    </div>
+    '''.format(group.name, group.get_member_count(), group_owner_name, group.description, group.id)

@@ -38,7 +38,7 @@
                 </div>
             {% endif %}
 
-        <form action="/group/{{ form.id.data }}" method="POST" class="needs-validation" novalidate>
+        <form action="{{ submit_endpoint }}" method="POST" class="needs-validation" novalidate>
             {{ form.csrf_token }}
             {{ render_field(form.id) }}
             <div class="row">
@@ -70,9 +70,7 @@
             {% if current_user.id == form.owner.data %}
                 <div id="loginFormButtonBar">
                     <button type="submit" class="btn btn-primary">Bestätigen</button>
-                    <a href="/group/{{ form.id.data }}">
-                        <button type="button" class="btn btn-secondary">Verwerfen</button>
-                    </a>
+                    <button type="reset" class="btn btn-secondary">Verwerfen</button>
                 </div>
             {% endif %}
         </form>

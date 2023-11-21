@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, HiddenField, TextAreaField, DateTimeLocalField, BooleanField, SelectField
+from wtforms import StringField, HiddenField, TextAreaField, DateTimeLocalField, BooleanField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Length
 
-from app.database import User, Studygroup
+from app.database import User, StudyGroup
 
 
 class GroupForm(FlaskForm):
@@ -13,7 +13,7 @@ class GroupForm(FlaskForm):
     creation_time = DateTimeLocalField('Erstellungszeitpunkt', render_kw={"disabled": True, "readonly": True})
     is_open = BooleanField('Beitrittsanfragen erlaubt')
 
-    def __init__(self, form=None, *, group: Studygroup = None, current_user: User = None, owner_options=None):
+    def __init__(self, form=None, *, group: StudyGroup = None, current_user: User = None, owner_options=None):
 
         super().__init__(form)
 
@@ -29,8 +29,7 @@ class GroupForm(FlaskForm):
         self.creation_time.data = group.creation_time
         self.is_open.data = group.is_open
 
-        owner_user = User.query.filter_by(id=group.owner).first()
-        self.owner.data = owner_user.id
+        self.owner.data = group.owner
 
         if current_user is not None and current_user.id != group.owner:
             self.name.render_kw = {"disabled": True, "readonly": True}

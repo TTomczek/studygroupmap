@@ -1,4 +1,4 @@
-from .database import User, Studygroup, StudygroupUser, JoinRequest, Message, MessageType
+from .database import User, StudyGroup, StudygroupUser, JoinRequest, Message, MessageType
 
 
 def init_db(db):
@@ -120,13 +120,13 @@ def init_db(db):
 
     db.session.commit()
 
-    if Studygroup.query.filter_by(name="AI Gruppe").first() is None:
-        group1 = Studygroup(name="AI Gruppe", description="Gruppe zur Erforschung der Vernichtung der Menschheit")
+    if StudyGroup.query.filter_by(name="AI Gruppe").first() is None:
+        group1 = StudyGroup(name="AI Gruppe", description="Gruppe zur Erforschung der Vernichtung der Menschheit")
         group1.owner = 4
         db.session.add(group1)
 
-    if Studygroup.query.filter_by(name="Computer Gruppe").first() is None:
-        group2 = Studygroup(name="Computer Gruppe", description="Wir mögen Computer")
+    if StudyGroup.query.filter_by(name="Computer Gruppe").first() is None:
+        group2 = StudyGroup(name="Computer Gruppe", description="Wir mögen Computer")
         group2.owner = 2
         group2.is_open = False
         db.session.add(group2)

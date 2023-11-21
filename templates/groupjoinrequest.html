@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import show_flashed_messages %}
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% block basecontent %}
+    <div class="basicContainer">
+        <h1>Beitritt anfragen für Gruppe {{ group.name }}</h1>
+        {{ show_flashed_messages() }}
+        <div class="basicContainer secondaryContainer">
+            <form action="{{ url_for('main.group_join_request', group_id=form.group_id.data) }}" method="post" novalidate>
+                {{ form.csrf_token }}
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.message) }}
+                    </div>
+                </div>
+                {{ render_field(form.submit) }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
