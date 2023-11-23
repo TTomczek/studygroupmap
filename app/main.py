@@ -50,7 +50,7 @@ def dashboard_students():
 
     filtered_users.append(current_user)
 
-    student_map = __get_centered_map(current_user)
+    student_map = __get_centered_map(current_user, height="50%")
 
     for user in filtered_users:
 
@@ -108,7 +108,7 @@ def dashboard_groups():
         filtered_other_open_groups = other_open_groups
 
     groups = my_groups + filtered_other_open_groups
-    group_map = __get_centered_map(current_user)
+    group_map = __get_centered_map(current_user, height="50%")
 
     for group in groups:
         color = "blue"
@@ -183,7 +183,7 @@ def profile_post():
 def profile_map():
     """Zeige Karte des Standortes des Nutzers."""
     user = current_user
-    profile_map = __get_centered_map(user, inital_zoom_level=15)
+    profile_map = __get_centered_map(user, inital_zoom_level=15, height="40%")
 
     if user.latitude != 0 and user.longitude != 0:
         (Marker([user.latitude, user.longitude],

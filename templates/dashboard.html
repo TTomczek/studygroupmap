@@ -47,7 +47,7 @@
                 <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="switchMapType('groups')">Gruppen</button>
                 <input type="text" placeholder="Suche" id="mapSearchInput" name="mapSearch" class="form-control w-auto d-inline float-end" oninput="mapSearchInputChanged()">
             </div>
-            <div id="mapContainer"></div>
+            <div id="dashboardMapContainer" class="mapContainer"></div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/dashboardFunctions.js') }}"></script>

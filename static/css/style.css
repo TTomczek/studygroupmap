@@ -47,7 +47,6 @@ a, a:visited, a:hover, a:active {
     width: calc(20% - 1rem);
     flex-grow: 0;
     max-height: 5.5rem;
-    text-overflow: ellipsis;
     box-sizing: border-box;
     min-width: 20rem;
 }
@@ -68,6 +67,14 @@ a, a:visited, a:hover, a:active {
 
 #mapToolbar > button:not(:last-child) {
     margin-right: 0.5rem;
+}
+
+.mapContainer {
+    overflow: hidden;
+}
+
+#dashboardMapContainer {
+    height: 50vh;
 }
 
 .listContainer {

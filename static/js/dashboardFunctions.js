@@ -35,7 +35,7 @@ function getMap(type, searchString) {
     fetch(fetchUrl)
     .then(response => response.text())
     .then(data => {
-        const mapContainer = document.getElementById('mapContainer');
+        const mapContainer = document.getElementById('dashboardMapContainer');
         mapContainer.innerHTML = "";
         mapContainer.insertAdjacentHTML('afterbegin', data);
     })
