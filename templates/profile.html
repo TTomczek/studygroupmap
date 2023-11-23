@@ -8,74 +8,97 @@
         {{ show_flashed_messages() }}
         <form action="/profile" method="POST" class="needs-validation" novalidate>
             {{ form.csrf_token }}
-            <div class="row">
-                <div class="col">
-                    {{ render_field(form.username, placeholder="Nutzername") }}
-                </div>
 
-                <div class="col">
-                    {{ render_field(form.password, placeholder="Neues Passwort") }}
-                </div>
+            <div class="form-category-block mb-3">
+                <div class="row d-flex">
+                    <div class="col-md-4">
+                        {{ render_field(form.username, placeholder="Nutzername") }}
+                    </div>
 
-                <div class="col">
-                    {{ render_field(form.password_repeat, placeholder="Neues Passwort wiederholen") }}
-                </div>
-            </div>
+                    <div class="col-md-4">
+                        {{ render_field(form.password, placeholder="Neues Passwort") }}
+                    </div>
 
-            <div class="row">
-                <div class="col">
-                    {{ render_field(form.email, placeholder="E-Mail") }}
-                </div>
-
-                <div class="col">
-                    {{ render_field(form.firstname, placeholder="Vorname") }}
-                </div>
-
-                <div class="col">
-                    {{ render_field(form.lastname, placeholder="Nachname") }}
-                </div>
-
-                <div class="col">
-                    {{ render_field(form.phone, placeholder="Telefonnummer") }}
+                    <div class="col-md-4">
+                        {{ render_field(form.password_repeat, placeholder="Neues Passwort wiederholen") }}
+                    </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    {{ render_field(form.courseofstudy, placeholder="Studiengang") }}
+            <div class="form-category-block mb-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ render_field(form.email, placeholder="E-Mail") }}
+                    </div>
+
+                    <div class="col-md-3">
+                        {{ render_field(form.firstname, placeholder="Vorname") }}
+                    </div>
+
+                    <div class="col-md-3">
+                        {{ render_field(form.lastname, placeholder="Nachname") }}
+                    </div>
+
+                    <div class="col-md-3">
+                        {{ render_field(form.phone, placeholder="Telefonnummer") }}
+                    </div>
                 </div>
 
-                <div class="col">
-                    {{ render_field(form.semester, placeholder="Semester") }}
-                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ render_field(form.courseofstudy, placeholder="Studiengang") }}
+                    </div>
 
-                <div class="col">
-                    {{ render_field(form.studentnumber, placeholder="Matrikelnummer") }}
+                    <div class="col-md-4">
+                        {{ render_field(form.semester, placeholder="Semester") }}
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ render_field(form.studentnumber, placeholder="Matrikelnummer") }}
+                    </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    {{ render_field(form.street, placeholder="Straße") }}
+            <div class="form-category-block mb-3">
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.street, placeholder="Straße") }}
+                    </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ render_field(form.postcode, placeholder="Postleitzahl") }}
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ render_field(form.city, placeholder="Stadt") }}
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ render_field(form.country, placeholder="Land") }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5">
+                        {{ render_field(form.latitude, placeholder="Manuelle Korrektur falls Adressauflösung fehlschlägt") }}
+                    </div>
+
+                    <div class="col-md-5">
+                        {{ render_field(form.longitude, placeholder="Manuelle Korrektur falls Adressauflösung fehlschlägt") }}
+                    </div>
+
+                    <div class="col-md-2 d-flex">
+                        <button class="btn btn-primary align-self-end mb-3" type="button" data-bs-toggle="collapse" href="#collapseMap">Zeige auf Karte</button>
+                    </div>
+                </div>
+
+                <div class="row collapse" id="collapseMap"></div>
             </div>
 
             <div class="row">
-                <div class="col">
-                    {{ render_field(form.postcode, placeholder="Postleitzahl") }}
-                </div>
-
-                <div class="col">
-                    {{ render_field(form.city, placeholder="Stadt") }}
-                </div>
-
-                <div class="col">
-                    {{ render_field(form.country, placeholder="Land") }}
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-2 d-flex align-items-center">
+                <div class="col-2">
                     {{ render_field(form.can_be_invited) }}
                 </div>
             </div>
@@ -88,10 +111,9 @@
 
             <div id="loginFormButtonBar">
                 <button type="submit" class="btn btn-primary">Bestätigen</button>
-                <a href="{{ url_for('main.profile') }}">
-                    <button type="button" class="btn btn-secondary">Verwerfen</button>
-                </a>
+                <button type="reset" class="btn btn-secondary">Verwerfen</button>
             </div>
         </form>
     </div>
+    <script src="{{ url_for('static', filename='js/profileFunctions.js') }}"></script>
 {% endblock %}

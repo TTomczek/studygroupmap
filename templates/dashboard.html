@@ -43,8 +43,9 @@
         <h2>Karte</h2>
         <div class="basicContainer secondaryContainer">
             <div class="basicContainer secondaryContainer mb-3" id="mapToolbar">
-                <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="getMap('students')">Studierende</button>
-                <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="getMap('groups')">Gruppen</button>
+                <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="switchMapType('students')">Studierende</button>
+                <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="switchMapType('groups')">Gruppen</button>
+                <input type="text" placeholder="Suche" id="mapSearchInput" name="mapSearch" class="form-control w-auto d-inline float-end" oninput="mapSearchInputChanged()">
             </div>
             <div id="mapContainer"></div>
         </div>

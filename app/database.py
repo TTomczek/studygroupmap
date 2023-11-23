@@ -63,15 +63,13 @@ class User(UserMixin, db.Model):
 
             app.logger.warning("Cannot update location")
 
-
     @staticmethod
     def get_studygroups_of_user_for_dashboard(user):
-        studygroups = db.session.execute(
+        return db.session.execute(
             text("SELECT sg.*, count(sgu.user) as member_count FROM Study_group sg "
                  "INNER JOIN studygroup_user sgu ON sg.id = sgu.studygroup "
                  "WHERE sg.id IN (SELECT DISTINCT sgu1.studygroup FROM studygroup_user sgu1 WHERE sgu1.user = :user)"
                  "GROUP BY sg.id;"), {"user": user.id}).fetchall()
-        return studygroups
 
     @staticmethod
     def hash_password(password):
@@ -123,8 +121,9 @@ class StudyGroup(db.Model):
             center_lat += user.latitude
             center_lon += user.longitude
 
-        center_lat /= len(users_in_group)
-        center_lon /= len(users_in_group)
+        user_count = len(users_in_group) if len(users_in_group) > 0 else 1
+        center_lat /= user_count
+        center_lon /= user_count
 
         return [center_lat, center_lon]
 

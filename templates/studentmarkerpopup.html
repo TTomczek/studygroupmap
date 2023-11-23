@@ -1,0 +1,13 @@
+    <div class="userPopup">
+        <div>Name: {{ user.firstname }} {{ user.lastname }}</div>
+        <div>Studiengang: {{ user.courseofstudy }}</div>
+        <div>Semester: {{ user.semester }}</div>
+        {% if user.about_me != "" %}
+            <div class="popupAboutMeContainer"><div>Über mich:</div> {{ user.about_me }}</div>
+        {% endif %}
+        <div class="d-flex flex-column flex-space-around gap-1 mt-1">
+            <a href="/group/join/{{ user.id }}" target="_parent">
+                <button class="btn btn-primary" type="button">Zu Gruppe einladen</button>
+            </a>
+        </div>
+    </div>
