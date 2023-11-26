@@ -1,6 +1,64 @@
 {% extends 'base.html' %}
+{% from 'macros.html' import show_flashed_messages %}
+
+{{ navbar_user(current_user) }}
 
 {% block basecontent %}
-    <h1>{{ title }}</h1>
-    <p>{{ content }}</p>
+    <div class="basicContainer">
+        {{ show_flashed_messages() }}
+
+        {% if join_requests %}
+            <h2>Offene Beitrittsanfragen</h2>
+            <div class="basicContainer secondaryContainer listContainer mb-3">
+                {% for join_request in join_requests %}
+                    <div class="basicContainer secondaryContainer groupMemberContainer">
+                        <div class="white-text">{{ join_request.invited_by.firstname }} {{ join_request.invited_by.lastname }} möchte dich in die Gruppe {{ join_request.group.name }} einladen.</div>
+                        <div>
+                            <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=1) }}">
+                                <button type="submit" class="btn btn-success">Annehmen</button>
+                            </a>
+                            <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=0) }}">
+                                <button type="submit" class="btn btn-danger">Ablehnen</button>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between"><h2>Meine Lerngruppen</h2><a href="{{ url_for('main.create_group') }}"><button type="button" class="btn btn-primary">Neue Gruppe erstellen</button></a></div>
+        <div class="basicContainer secondaryContainer mb-3" id="studygroup-dashboard-container">
+        {% if studygroups %}
+            {% for group in studygroups %}
+                <a href="{{ url_for('main.edit_group', group_id=group.id) }}" class=" basicContainer studygroupContainer">
+                    <div class="studygroupDashboardHeader">
+                        <div class="studygroupName">{{ group.name }}</div> <i class="bi bi-people"></i> {{ group.member_count }}
+                    </div>
+                    <div class="studygroupDescription">{{ group.description }}</div>
+                </a>
+            {% endfor %}
+        {% endif %}
+        </div>
+        <h2>Karte</h2>
+        <div class="basicContainer secondaryContainer">
+            <div class="basicContainer secondaryContainer mb-3 d-flex justify-content-between" id="mapToolbar">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="switchMapType('students')">Studierende</button>
+                    <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="switchMapType('groups')">Gruppen</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <select class="form-select w-auto" id="dashboardMapRangeSelect" value="0" oninput="mapSearchInputChanged()">
+                        <option value="0" selected>Kein Radius</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <input type="text" placeholder="Suche" id="mapSearchInput" name="mapSearch" class="form-control" oninput="mapSearchInputChanged()">
+                </div>
+            </div>
+            <div id="dashboardMapContainer" class="mapContainer"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboardFunctions.js') }}"></script>
 {% endblock %}

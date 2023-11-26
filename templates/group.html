@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_field, render_form %}
+{% from 'macros.html' import show_flashed_messages %}
+
+{% block basecontent %}
+    <div class="basicContainer">
+
+        <h1>{{ form.name.data }}</h1>
+
+        {{ show_flashed_messages() }}
+
+        {% if join_requests %}
+                <h2 class="mt-3">Beitrittsanfragen</h2>
+                <div class="basicContainer secondaryContainer listContainer mb-3">
+                    {% for join_request in join_requests %}
+                        {% if join_request.invited %}
+                            <div class="basicContainer secondaryContainer groupMemberContainer white-text">
+                                {{ join_request.invited_user.firstname }} {{ join_request.invited_user.lastname }} wurde von
+                                {{ join_request.invited_by.firstname }} {{ join_request.invited_by.lastname }} eingeladen.
+                            </div>
+                        {% else %}
+                            <div class="basicContainer secondaryContainer groupMemberContainer white-text">
+                                {{ join_request.invited_user.firstname }} {{ join_request.invited_user.lastname }} möchte der Gruppe beitreten.
+                                <div>{{ join_request.request.message }}</div>
+                                {% if current_user.id == form.owner.data %}
+                                    <div>
+                                        <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=1) }}">
+                                            <button type="submit" class="btn btn-success">Annehmen</button>
+                                        </a>
+                                        <a href="{{ url_for('main.answer_group_join_request', join_request_id=join_request.request.id, accepted=0) }}">
+                                            <button type="submit" class="btn btn-danger">Ablehnen</button>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        <form action="{{ submit_endpoint }}" method="POST" class="needs-validation" novalidate>
+            {{ form.csrf_token }}
+            {{ render_field(form.id) }}
+            <div class="row">
+                <div class="col">
+                    {{ render_field(form.name, placeholder="Gruppenname") }}
+                </div>
+
+                <div class="col">
+                    {{ render_field(form.owner) }}
+                </div>
+
+                <div class="col">
+                    {{ render_field(form.creation_time) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {{ render_field(form.description) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-1 d-flex align-items-center">
+                    {{ render_field(form.is_open) }}
+                </div>
+            </div>
+
+            {% if current_user.id == form.owner.data %}
+                <div id="loginFormButtonBar">
+                    <button type="submit" class="btn btn-primary">Bestätigen</button>
+                    <button type="reset" class="btn btn-secondary">Verwerfen</button>
+                </div>
+            {% endif %}
+        </form>
+
+        {% if member %}
+
+            <h2 class="mt-3">Mitglieder</h2>
+
+            <div class="basicContainer secondaryContainer listContainer">
+                {% for user in member %}
+                    <div class="basicContainer secondaryContainer groupMemberContainer">
+                        <div class="white-text">{{ user.firstname }} {{ user.lastname }}
+                            Beigetreten am: {{ user.joiningdate | datetime }}</div>
+
+                        {% if user.id != current_user.id and current_user.id == form.owner.data %}
+
+                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
+                                  class="removeUserFromGroupForm">
+                                {{ form.csrf_token }}
+                                <input type="text" name="reason" id="reason" placeholder="Grund"
+                                       class="form-control form-control-sm" required>
+                                <button type="submit" class="btn btn-danger btn-sm">Entfernen</button>
+                            </form>
+
+                        {% elif current_user.id == user.id %}
+
+                            <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
+                                  class="removeUserFromGroupForm">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmLeave(this)">
+                                    Verlassen
+                                </button>
+                            </form>
+
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/groupFunctions.js') }}"></script>
+{% endblock %}

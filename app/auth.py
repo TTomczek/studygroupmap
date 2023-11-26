@@ -2,7 +2,7 @@ import bcrypt
 from flask import Blueprint, render_template, request, flash, url_for, redirect
 from flask_login import login_user, logout_user, login_required
 
-from .models import User
+from .database import User
 from . import db, app
 
 auth = Blueprint('auth', __name__)
@@ -10,11 +10,13 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET'])
 def login():
+    """Zeige Loginseite an."""
     return render_template('login.html', title='Login')
 
 
 @auth.route('/login', methods=['POST'])
 def login_post():
+    """Verarbeite Login-Formular."""
     username = request.form.get('username')
     password = request.form.get('password')
     remember_me = True if request.form.get('remember') else False
@@ -22,10 +24,9 @@ def login_post():
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return render_template('login.html', title='Login',
-                               message='Benutzername oder Passwort falsch.')
+        flash('Benutzername oder Passwort falsch.', 'danger')
+        return render_template('login.html', title='Login')
 
-    pepper = app.config['PEPPER']
     if not User.check_password(password, user.password):
         flash('Benutzername oder Passwort falsch.', 'danger')
         return render_template('login.html', title='Login')
@@ -36,11 +37,13 @@ def login_post():
 
 @auth.route('/signup', methods=['GET'])
 def signup():
+    """Zeige Registrierungsseite an."""
     return render_template('signup.html', title='Registrieren')
 
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    """Verarbeite Registrierungs-Formular."""
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
@@ -63,6 +66,7 @@ def signup_post():
 @auth.route('/logout')
 @login_required
 def logout():
+    """Logge Benutzer aus und zeige Login-Seite an."""
     logout_user()
     return redirect(url_for('auth.login'))
 

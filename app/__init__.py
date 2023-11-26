@@ -1,36 +1,21 @@
 import json
 
+import pytz
 from flask import Flask
+from flask_bootstrap import Bootstrap5
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-
-
-def add_initial_user(db):
-
-    if User.query.filter_by(email="admin@bla.outer").first() is None:
-        user1 = User(username="admin", email="admin@bla.outer", password=User.hash_password("admin"))
-        user1.firstname = "Admin"
-        user1.lastname = "of Network"
-        user1.city = "Berlin"
-        user1.country = "Germany"
-        user1.street = "Straße des 17. Juni 135"
-        user1.postcode = "10623"
-        user1.phone = "+49 30 314-0"
-        user1.studentnumber = "1234567890"
-        user1.courseofstudy = "Computer Science"
-        user1.semester = "3"
-
-        db.session.add(user1)
-        db.session.commit()
-
 
 db = SQLAlchemy()
 app = Flask(__name__,
             static_folder='../static',
             template_folder='../templates',
             static_url_path='')
+bootstrap = Bootstrap5(app)
 
 app.config.from_file('config.json', load=json.load)
+
+APP_TZ = pytz.timezone(app.config['TIMEZONE'])
 
 
 with app.app_context():
@@ -46,13 +31,21 @@ with app.app_context():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .models import User, Studygroup, StudygroupUser
+    from .database import *
     db.create_all()
     db.session.commit()
 
-    add_initial_user(db)
+    from .default_db import init_db
+    init_db(db)
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.template_filter('datetime')
+def format_datetime(value, format="%d.%m.%Y %H:%M"):
+    if value is None:
+        return ""
+    return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f').strftime(format)

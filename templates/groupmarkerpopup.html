@@ -1,0 +1,13 @@
+<div class="groupPopup">
+        <div>Name: {{ group.name }}</div>
+        <div>Mitglieder: {{ group.get_member_count() }}</div>
+        <div>Besitzer: {{ group_owner_name }}</div>
+        {% if group.description != "" %}
+            <div class="popupDescriptionField">Beschreibung: {{ group.description }}</div>
+        {% endif %}
+        <div class="d-flex flex-column flex-space-around gap-1 mt-1">
+            <a href="/group/join/request/{{ group.id }}" target="_parent">
+                <button class="btn btn-primary" type="button">Beitritt anfragen</button>
+            </a>
+        </div>
+    </div>
