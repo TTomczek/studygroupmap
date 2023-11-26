@@ -41,10 +41,21 @@
         </div>
         <h2>Karte</h2>
         <div class="basicContainer secondaryContainer">
-            <div class="basicContainer secondaryContainer mb-3" id="mapToolbar">
-                <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="switchMapType('students')">Studierende</button>
-                <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="switchMapType('groups')">Gruppen</button>
-                <input type="text" placeholder="Suche" id="mapSearchInput" name="mapSearch" class="form-control w-auto d-inline float-end" oninput="mapSearchInputChanged()">
+            <div class="basicContainer secondaryContainer mb-3 d-flex justify-content-between" id="mapToolbar">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="mapToolbarBtnStudents" type="button" onclick="switchMapType('students')">Studierende</button>
+                    <button class="btn btn-primary" id="mapToolbarBtnGroups" type="button" onclick="switchMapType('groups')">Gruppen</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <select class="form-select w-auto" id="dashboardMapRangeSelect" value="0" oninput="mapSearchInputChanged()">
+                        <option value="0" selected>Kein Radius</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <input type="text" placeholder="Suche" id="mapSearchInput" name="mapSearch" class="form-control" oninput="mapSearchInputChanged()">
+                </div>
             </div>
             <div id="dashboardMapContainer" class="mapContainer"></div>
         </div>

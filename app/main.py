@@ -11,6 +11,7 @@ from app.form.groupform import GroupForm
 from app.form.groupinviteform import AddToGroupForm
 from app.form.groupjoinrequest import GroupJoinRequest
 from app.form.profileform import ProfileForm
+from app.geocoding import get_distance_between_coords
 
 main = Blueprint('main', __name__)
 
@@ -42,11 +43,17 @@ def dashboard_students():
     """Zeige Karte der Nutzer."""
     other_users = User.query.filter(and_(User.can_be_invited, User.id != current_user.id)).all()
 
+    radius = request.args.get('radius', default=0, type=int)
+    if radius > 0:
+        other_users_by_radius = [user for user in other_users if get_distance_between_coords(current_user.latitude, current_user.longitude, user.latitude, user.longitude) <= radius]
+    else:
+        other_users_by_radius = other_users
+
     search_string = request.args.get('search_string', default="", type=str)
     if search_string != "":
-        filtered_users = __filter_users_by_search_string(other_users, search_string)
+        filtered_users = __filter_users_by_search_string(other_users_by_radius, search_string)
     else:
-        filtered_users = other_users
+        filtered_users = other_users_by_radius
 
     filtered_users.append(current_user)
 
@@ -101,16 +108,23 @@ def dashboard_groups():
         )
     ).all()
 
+    open_and_my_groups = other_open_groups + my_groups
+
+    radius = request.args.get('radius', default=0, type=int)
+    if radius > 0:
+        open_and_my_groups_by_radius = [group for group in open_and_my_groups if get_distance_between_coords(current_user.latitude, current_user.longitude, *group.get_group_location()) <= radius]
+    else:
+        open_and_my_groups_by_radius = open_and_my_groups
+
     search_string = request.args.get('search_string', default="", type=str)
     if search_string != "":
-        filtered_other_open_groups = __filter_groups_by_search_string(other_open_groups, search_string)
+        filtered_other_open_groups = __filter_groups_by_search_string(open_and_my_groups_by_radius, search_string)
     else:
-        filtered_other_open_groups = other_open_groups
+        filtered_other_open_groups = open_and_my_groups_by_radius
 
-    groups = my_groups + filtered_other_open_groups
     group_map = __get_centered_map(current_user, height="50%")
 
-    for group in groups:
+    for group in filtered_other_open_groups:
         color = "blue"
         if group.id in group_ids_of_cu:
             color = "green"

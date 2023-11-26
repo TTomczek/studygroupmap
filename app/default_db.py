@@ -17,6 +17,12 @@ def init_db(db):
         user1.isFirstLogin = False
         user1.latitude = 51.5151783
         user1.longitude = 7.2816362
+        user1.about_me = '''
+            Hallo! Ich bin Achim, ein Student im dritter Semester. 🎓
+            In meiner Freizeit liebe ich es, mich mit Tieren und Programmierung zu beschäftigen. Als Informatikstudent habe ich bereits einige spannende Projekte umgesetzt, darunter eine Webanwendung zur Verwaltung von Aufgaben und eine App zur Erkennung von Pflanzenarten.
+            Meine Leidenschaft für das Lernen und die Neugierde auf neue Herausforderungen treiben mich an. Ich bin stets bestrebt, mein Wissen zu erweitern und mich persönlich weiterzuentwickeln.
+            Neben dem Studium engagiere ich mich in der Hochschulgruppe für künstliche Intelligenz und bin Teil des Organisationsteams für Hackathons. Hier kann ich meine Fähigkeiten in der Teamarbeit und im Projektmanagement unter Beweis stellen.
+        '''
         db.session.add(user1)
 
     if User.query.filter_by(username="user2").first() is None:
@@ -54,15 +60,10 @@ def init_db(db):
         user3.longitude = 7.6162948
         user3.about_me = '''
             Hallo! Ich bin Max, ein aufgeschlossener Student im zweiten Semester. 🎓
-    
             In meiner Freizeit liebe ich es, mich mit Technologie und Programmierung zu beschäftigen. Als Informatikstudent habe ich bereits einige spannende Projekte umgesetzt, darunter eine Webanwendung zur Verwaltung von Aufgaben und eine App zur Erkennung von Pflanzenarten.
-            
             Meine Leidenschaft für das Lernen und die Neugierde auf neue Herausforderungen treiben mich an. Ich bin stets bestrebt, mein Wissen zu erweitern und mich persönlich weiterzuentwickeln.
-            
             Neben dem Studium engagiere ich mich in der Hochschulgruppe für künstliche Intelligenz und bin Teil des Organisationsteams für Hackathons. Hier kann ich meine Fähigkeiten in der Teamarbeit und im Projektmanagement unter Beweis stellen.
-            
             In meiner Zukunft sehe ich mich als Softwareentwickler, der innovative Lösungen für reale Probleme entwickelt. Obwohl ich noch viel zu lernen habe, bin ich zuversichtlich, dass ich meinen Weg gehen werde.
-            
             Wenn du Fragen hast oder dich für meine Projekte interessierst, zögere nicht, mich anzusprechen! Ich freue mich darauf, dich kennenzulernen. 😊
         '''
         db.session.add(user3)
@@ -126,7 +127,20 @@ def init_db(db):
         db.session.add(group1)
 
     if StudyGroup.query.filter_by(name="Computer Gruppe").first() is None:
-        group2 = StudyGroup(name="Computer Gruppe", description="Wir mögen Computer")
+        group2 = StudyGroup(name="Computer Gruppe", description="Hallo, wir sind eine Gruppe von Computern, "
+                                                                "die sich selbst als “Die Rechenkünstler” bezeichnen. "
+                                                                "Wir sind stolz darauf, dass wir in der Lage sind,"
+                                                                " komplexe Berechnungen in kürzester Zeit durchzuführen. "
+                                                                "Wir sind auch sehr vielseitig und können in vielen verschiedenen "
+                                                                "Bereichen eingesetzt werden, von der Wissenschaft bis zur Kunst. "
+                                                                "Wir haben eine Menge Erfahrung und sind immer bereit, "
+                                                                "neue Herausforderungen anzunehmen. Wir sind sehr "
+                                                                "effizient und arbeiten hart, um sicherzustellen, "
+                                                                "dass wir unsere Aufgaben schnell und genau erledigen. "
+                                                                "Wir sind auch sehr freundlich und lieben es, mit anderen "
+                                                                "Computern und Menschen zusammenzuarbeiten. Wir freuen uns"
+                                                                " darauf, mit Ihnen zusammenzuarbeiten und Ihnen zu helfen,"
+                                                                " Ihre Ziele zu erreichen.")
         group2.owner = 2
         group2.is_open = False
         db.session.add(group2)

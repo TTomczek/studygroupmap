@@ -120,8 +120,16 @@ a, a:visited, a:hover, a:active {
     content: "\A";
 }
 
-.userPopup {
+.userPopup, .groupPopup {
     font-size: small;
+}
+
+.popupAboutMeContainer {
+    width: 50vw;
+}
+
+.popupDescriptionField {
+    width: 50vw;
 }
 
 .form-category-block {
@@ -138,3 +146,5 @@ div.required > label::after {
   content: "*";
   color: red;
 }
+
+

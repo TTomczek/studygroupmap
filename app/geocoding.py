@@ -5,7 +5,7 @@ import random
 
 import certifi
 import geopy
-from geopy import Nominatim
+from geopy import Nominatim, distance
 from geopy.exc import GeocoderUnavailable
 from geopy.extra.rate_limiter import RateLimiter
 
@@ -56,6 +56,11 @@ def get_coordinates(address_string: str):
         return None, None
 
     return location.latitude, location.longitude
+
+
+def get_distance_between_coords(lat1, lon1, lat2, lon2):
+    """Gibt die Distanz zwischen zwei Koordinaten in Kilometer zurück."""
+    return distance.distance((lat1, lon1), (lat2, lon2)).km
 
 
 geocode = get_geocode()
