@@ -15,6 +15,7 @@ geopy.geocoders.options.default_ssl_context = ctx = ssl.create_default_context(c
 
 
 def get_geocode():
+    """Gibt eine Funktion zurück, die eine Adresse in Koordinaten umwandelt."""
     try:
         geolocator = Nominatim(user_agent="LerngruppenKarte", scheme="https")
         geocode_de = partial(geolocator.geocode, language="de")
@@ -24,24 +25,20 @@ def get_geocode():
 
 
 def randomize_coordinates(lat, lon):
-    # approximate radius of earth in km
+    """Generiert zufällige Koordinaten in der Nähe der übergebenen Koordinaten.
+    Die Koorianten befinden sich in einem Umkreis von 50 bis 200 Metern."""
     r = 6373.0
 
-    # convert decimal degrees to radians
     lat = radians(lat)
     lon = radians(lon)
 
-    # generate random distance between 50 and 200 meters
     distance = random.uniform(0.05, 0.2)
 
-    # generate random angle between 0 and 360 degrees
     angle = random.uniform(0, 360)
 
-    # calculate new coordinates
     lat_new = lat + (distance / r) * cos(radians(angle))
     lon_new = lon + (distance / (r * cos(lat))) * sin(radians(angle))
 
-    # convert radians back to decimal degrees
     lat_new = degrees(lat_new)
     lon_new = degrees(lon_new)
 
@@ -49,7 +46,7 @@ def randomize_coordinates(lat, lon):
 
 
 def get_coordinates(address_string: str):
-
+    """Gibt die Koordinaten einer Adresse zurück."""
     if address_string is None:
         return None, None
 

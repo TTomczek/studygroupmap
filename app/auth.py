@@ -10,11 +10,13 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET'])
 def login():
+    """Zeige Loginseite an."""
     return render_template('login.html', title='Login')
 
 
 @auth.route('/login', methods=['POST'])
 def login_post():
+    """Verarbeite Login-Formular."""
     username = request.form.get('username')
     password = request.form.get('password')
     remember_me = True if request.form.get('remember') else False
@@ -35,11 +37,13 @@ def login_post():
 
 @auth.route('/signup', methods=['GET'])
 def signup():
+    """Zeige Registrierungsseite an."""
     return render_template('signup.html', title='Registrieren')
 
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    """Verarbeite Registrierungs-Formular."""
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
@@ -62,6 +66,7 @@ def signup_post():
 @auth.route('/logout')
 @login_required
 def logout():
+    """Logge Benutzer aus und zeige Login-Seite an."""
     logout_user()
     return redirect(url_for('auth.login'))
 

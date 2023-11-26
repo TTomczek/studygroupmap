@@ -1,4 +1,4 @@
-from .database import User, StudyGroup, StudygroupUser, JoinRequest, Message, MessageType
+from .database import User, StudyGroup, StudygroupUser, JoinRequest
 
 
 def init_db(db):
@@ -149,14 +149,6 @@ def init_db(db):
     db.session.add(group22)
     db.session.add(group32)
     db.session.add(group42)
-
-    db.session.commit()
-
-    MessageType.query.delete()
-    message_type2 = MessageType(name="feed", description="Nachricht für den Feed")
-    message_type1 = MessageType(name="message", description="Nachricht unter Nutzern")
-    db.session.add(message_type2)
-    db.session.add(message_type1)
 
     db.session.commit()
 

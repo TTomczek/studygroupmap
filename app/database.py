@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
         return self.id == other.id
 
     def update_location(self):
-
+        """Aktualisieren der Koordinaten anhand der Adresse."""
         city_postcode = ' '.join([self.postcode, self.city])
         location_string = ','.join([self.street, city_postcode, self.country])
 
@@ -65,6 +65,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def get_studygroups_of_user_for_dashboard(user):
+        """Gibt alle Gruppen zurück, in denen der Benutzer Mitglied ist und wie viele Mitglieder diese haben."""
         return db.session.execute(
             text("SELECT sg.*, count(sgu.user) as member_count FROM Study_group sg "
                  "INNER JOIN studygroup_user sgu ON sg.id = sgu.studygroup "
@@ -73,6 +74,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def hash_password(password):
+        """Hashen des Passworts mit Salt und Pepper."""
         salt = bcrypt.gensalt()
         pepper = app.config['PEPPER']
 
@@ -85,6 +87,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def check_password(password, hashed_password):
+        """Prüfen, ob das Passwort korrekt ist."""
         pepper = app.config['PEPPER']
 
         password_bytes = password.encode('utf-8')
@@ -110,6 +113,8 @@ class StudyGroup(db.Model):
         self.owner = owner
 
     def get_group_location(self):
+        """Gibt die Koordinaten des Gruppenmittelpunkts zurück.
+        Der Mittelpunkt wird aus den Koordinaten der Mitglieder berechnet."""
         users_in_group = db.session.execute(
             text('SELECT * FROM User INNER JOIN studygroup_user ON User.id = studygroup_user.user '
                  'WHERE studygroup_user.studygroup = :studygroup'), {"studygroup": self.id}).fetchall()
@@ -128,6 +133,7 @@ class StudyGroup(db.Model):
         return [center_lat, center_lon]
 
     def get_member(self):
+        """Gibt alle Mitglieder der Gruppe zurück."""
         return db.session.execute(
             text('SELECT sgu.joiningdate, u.* FROM studygroup_user sgu INNER JOIN User u ON sgu.user = u.id '
                  'WHERE sgu.studygroup = :group_id'),
@@ -135,9 +141,11 @@ class StudyGroup(db.Model):
         ).fetchall()
 
     def get_member_count(self):
+        """Gibt die Anzahl der Mitglieder der Gruppe zurück."""
         return StudygroupUser.query.filter_by(studygroup=self.id).count()
 
     def get_owner_user(self):
+        """Gibt den Besitzer der Gruppe, als User, zurück."""
         return User.query.filter_by(id=self.owner).first()
 
 
@@ -154,7 +162,8 @@ class StudygroupUser(db.Model):
         self.joiningdate = joiningdate
 
     @staticmethod
-    def get_groups_ids_of_useer(user_id):
+    def get_groups_ids_of_user(user_id):
+        """Gibt die IDs aller Gruppen zurück, in denen der Benutzer Mitglied ist."""
         return StudygroupUser.query.distinct(StudygroupUser.studygroup).filter_by(user=user_id).all()
 
 
@@ -177,73 +186,6 @@ class JoinRequest(db.Model):
         self.requestdate = request_date
 
 
-class MessageType(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False, default="")
-    description = db.Column(db.String(500), nullable=False, default="")
-
-    def __init__(self, name: str, description: str, id=None):
-        self.id = id
-        self.name = name
-        self.description = description
-
-
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    title = db.Column(db.String(50), nullable=False, default="")
-    message = db.Column(db.String(500), nullable=False, default="")
-    messagedate = db.Column(db.DateTime, nullable=False, default=datetime.now(APP_TZ))
-    message_type = db.Column(db.Integer, db.ForeignKey('message_type.id'), nullable=False)
-    read = db.Column(db.Boolean, nullable=False, default=False)
-
-    def __init__(self, receiver: int, sender: int, title: str, message: str = "", message_type: str = "message",
-                 read: bool = False, id=None, message_date=datetime.now(APP_TZ)):
-        self.id = id
-        self.sender = sender
-        self.receiver = receiver
-        self.title = title
-        self.message = message
-        self.messagedate = message_date
-        self.read = read
-
-        message_type_found = MessageType.query.filter_by(name=message_type).first()
-        if message_type_found is None:
-            print("Error: Message type not found.", message_type)
-            return
-
-        self.message_type = message_type_found.id
-
-    @staticmethod
-    def get_messages(user_id: int, unread_only: bool = False, message_type: str = "message"):
-
-        message_type_found = MessageType.query.filter_by(name=message_type).first()
-
-        if message_type_found is None:
-            print("Error: Message type not found.", message_type)
-            return []
-
-        return Message.query.filter_by(receiver=user_id, read=unread_only, message_type=message_type_found.id).all()
-
-    @staticmethod
-    def get_message_count_for_user(user_id: int, unread_only: bool = False):
-
-        message_type_found = MessageType.query.filter_by(name='message').first()
-
-        if message_type_found is None:
-            return 0
-
-        return Message.query.filter_by(receiver=user_id, read=unread_only, message_type=message_type_found.id).count()
-
-    @staticmethod
-    def send_message(receiver: int, sender: int, title: str, message: str = "", message_type: str = "message"):
-
-        message = Message(receiver, sender, title, message, message_type)
-        db.session.add(message)
-        db.session.commit()
-
-
 class JoinRequestPresentation:
     request: JoinRequest
     invited_user: User
@@ -262,7 +204,7 @@ class JoinRequestPresentation:
 
 
 def get_join_requests_for_group(group_id: int):
-
+    """Gibt alle Beitrittsanfragen für eine Gruppe zurück."""
     # Normalerweise werden Vergleiche mit None mit einem is gemacht, aber das funktioniert bei SqlAlchemy nicht.
     raw_join_requests = JoinRequest.query.filter(JoinRequest.accepted == None, JoinRequest.studygroup == group_id).all()
 
@@ -274,7 +216,7 @@ def get_join_requests_for_group(group_id: int):
 
 
 def get_invitations_for_user(user_id: int):
-
+    """Gibt alle Einladungen für einen Benutzer zurück."""
     # Normalerweise werden Vergleiche mit None mit einem is gemacht, aber das funktioniert bei SqlAlchemy nicht.
     raw_join_requests = JoinRequest.query.filter(JoinRequest.accepted == None, JoinRequest.invited_user == user_id,
                                                  JoinRequest.invited_by != None).all()

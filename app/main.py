@@ -5,7 +5,7 @@ from folium import folium, Marker, Icon
 from sqlalchemy import and_
 
 from app import db
-from app.database import User, StudyGroup, StudygroupUser, Message, JoinRequest, get_join_requests_for_group, \
+from app.database import User, StudyGroup, StudygroupUser, JoinRequest, get_join_requests_for_group, \
     get_invitations_for_user
 from app.form.groupform import GroupForm
 from app.form.groupinviteform import AddToGroupForm
@@ -266,9 +266,6 @@ def remove_group_member(group_id: int, user_id: int):
         flash("Du hast die Gruppe erfolgreich verlassen.", "success")
         return redirect(url_for('main.dashboard'))
 
-    Message.send_message(user_id, group.owner, "Du wurdest aus der Gruppe '" + group.name + "' entfernt.",
-                         "Begründung: " + request.form['reason'], 'feed')
-
     flash("Benutzer erfolgreich entfernt.", "success")
     return edit_group(group_id)
 
@@ -314,8 +311,8 @@ def create_group_post():
 @login_required
 def join(invited_user_id: int):
     """Anzeigen des Formulares zum Einladen eines Nutzers in eine Gruppe."""
-    groups_of_current_user = StudygroupUser.get_groups_ids_of_useer(current_user.id)
-    groups_of_invited_user = StudygroupUser.get_groups_ids_of_useer(invited_user_id)
+    groups_of_current_user = StudygroupUser.get_groups_ids_of_user(current_user.id)
+    groups_of_invited_user = StudygroupUser.get_groups_ids_of_user(invited_user_id)
     possible_group_ids = [x.id for x in groups_of_current_user if x not in groups_of_invited_user]
     possible_groups = StudyGroup.query.filter(StudyGroup.id.in_(possible_group_ids)).all()
     group_choices = [(group.id, group.name) for group in possible_groups]
