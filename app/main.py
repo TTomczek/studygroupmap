@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from branca.element import CssLink
 from flask import Blueprint, url_for, redirect, render_template, request, flash
 from flask_login import login_required, current_user
@@ -211,7 +213,7 @@ def profile_map():
 
 @main.route('/group/<int:group_id>')
 @login_required
-def edit_group(group_id: int, group_form=None):
+def edit_group(group_id: int, group_form: GroupForm=None):
     """Anzeigen und Bearbeiten der Gruppe."""
     group = StudyGroup.query.filter_by(id=group_id).first()
     member = group.get_member()
@@ -220,9 +222,8 @@ def edit_group(group_id: int, group_form=None):
         flash("Du bist kein Mitglied dieser Gruppe.", "danger")
         return redirect(url_for('main.dashboard'))
 
-    owner_options = [(user.id, user.firstname + " " + user.lastname) for user in member]
-
     if group_form is None:
+        owner_options = [(user.id, user.firstname + " " + user.lastname) for user in member]
         group_form = GroupForm(group=group, current_user=current_user, owner_options=owner_options)
 
     return render_template('group.html', title='Gruppe bearbeiten', form=group_form, member=member,
@@ -287,7 +288,7 @@ def remove_group_member(group_id: int, user_id: int):
 @main.route('/group/create')
 @login_required
 def create_group():
-    """Anzeigen des Formulares zur Erstellung einer neuen Gruppe."""
+    """Anzeigen des Formulars zur Erstellung einer neuen Gruppe."""
     group = StudyGroup(name="Neue Gruppe")
     group.is_open = True
     group.owner = current_user.id
@@ -445,6 +446,13 @@ def group_join_request_post(group_id: int):
 
     flash("Beitrittsanfrage erfolgreich versendet.", "success")
     return redirect(url_for('main.dashboard'))
+
+
+@main.app_template_filter('datetime')
+def format_datetime(value, format="%d.%m.%Y %H:%M"):
+    if value is None:
+        return ""
+    return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f').strftime(format)
 
 
 def __accept_join_request(join_request: JoinRequest, group: StudyGroup, is_invitation: bool):

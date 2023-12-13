@@ -8,9 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 app = Flask(__name__,
-            static_folder='../static',
-            template_folder='../templates',
-            static_url_path='')
+            static_url_path='',
+            instance_relative_config=True)
 bootstrap = Bootstrap5(app)
 
 app.config.from_file('config.json', load=json.load)
@@ -42,10 +41,3 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-
-@app.template_filter('datetime')
-def format_datetime(value, format="%d.%m.%Y %H:%M"):
-    if value is None:
-        return ""
-    return datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f').strftime(format)
