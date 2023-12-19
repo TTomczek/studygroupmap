@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'bootstrap5/form.html' import render_field, render_form %}
+{% from 'bootstrap5/form.html' import render_field %}
 {% from 'macros.html' import show_flashed_messages %}
 
 {% block basecontent %}
@@ -99,6 +99,7 @@
 
                             <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
                                   class="removeUserFromGroupForm">
+                                {{ form.csrf_token }}
                                 <button type="button" class="btn btn-danger btn-sm" onclick="confirmLeave(this)">
                                     Verlassen
                                 </button>
