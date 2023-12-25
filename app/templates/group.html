@@ -83,7 +83,12 @@
                 {% for user in member %}
                     <div class="basicContainer secondaryContainer groupMemberContainer">
                         <div class="white-text">{{ user.firstname }} {{ user.lastname }}
-                            Beigetreten am: {{ user.joiningdate | datetime }}</div>
+                            Beigetreten am: {{ user.joiningdate | datetime }}
+                        </div>
+                        <div class="contact white-text">
+                            <span>Tel: {{ user.phone }}</span>
+                            <span>Mail: {{ user.email }}</span>
+                        </div>
 
                         {% if user.id != current_user.id and current_user.id == form.owner.data %}
 

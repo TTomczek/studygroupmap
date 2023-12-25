@@ -164,10 +164,6 @@ def init_db(db):
 
     db.session.commit()
 
-    if JoinRequest.query.filter_by(invited_user=6, studygroup=1).first() is None:
-        join_request = JoinRequest(invited_user_id=6, studygroup_id=1, invited_by_id=5, message="Du sollst auch AI studieren!")
-        db.session.add(join_request)
-
     if JoinRequest.query.filter_by(invited_user=1, studygroup=1).first() is None:
         join_request = JoinRequest(invited_user_id=1, studygroup_id=1, message="LET ME IN!")
         db.session.add(join_request)

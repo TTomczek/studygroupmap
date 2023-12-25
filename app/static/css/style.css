@@ -100,6 +100,11 @@ a, a:visited, a:hover, a:active {
     padding: 1rem;
 }
 
+.groupMemberContainer > .contact {
+    margin-left: 1rem;
+    flex-grow: 2;
+}
+
 .white-text {
     color: white;
 }
