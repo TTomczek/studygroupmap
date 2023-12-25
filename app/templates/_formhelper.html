@@ -1,0 +1,13 @@
+{% macro render_field(field) %}
+    <div class="form-floating">
+        <input type="{{ field.widget }}" name="{{ field.id }}" id="{{ field.id }}" placeholder="Nutzername" class="form-control {% if field.errors %}is-invalid{% endif %}" value="{{ field.data }}">
+        <label for="{{ field.id }}">{{ field.label }}</label>
+        {% if field.errors %}
+            <div class="invalid-feedback">
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
