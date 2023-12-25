@@ -104,19 +104,17 @@ def init_db(db):
 
     if User.query.filter_by(username="user6").first() is None:
         user6 = User(username="user6", email="user6@user6.mail", password=User.hash_password("user6"))
-        user6.firstname = "Ronald"
-        user6.lastname = "Bertels"
-        user6.city = "Iserlohn"
-        user6.country = "Deutschland"
-        user6.street = "Gartenstraße 22"
-        user6.postcode = "58636"
-        user6.phone = "+49 30 457-9"
-        user6.studentnumber = "666666666"
-        user6.courseofstudy = "Computer Science Network Engineering"
-        user6.semester = "1"
-        user6.isFirstLogin = False
-        user6.latitude = 51.3771835
-        user6.longitude = 7.696676
+        user6.firstname = ""
+        user6.lastname = ""
+        user6.city = ""
+        user6.country = ""
+        user6.street = ""
+        user6.postcode = ""
+        user6.phone = ""
+        user6.studentnumber = ""
+        user6.courseofstudy = ""
+        user6.semester = ""
+        user6.isFirstLogin = True
         db.session.add(user6)
 
     db.session.commit()
@@ -165,10 +163,6 @@ def init_db(db):
     db.session.add(group42)
 
     db.session.commit()
-
-    if JoinRequest.query.filter_by(invited_user=6, studygroup=1).first() is None:
-        join_request = JoinRequest(invited_user_id=6, studygroup_id=1, invited_by_id=5, message="Du sollst auch AI studieren!")
-        db.session.add(join_request)
 
     if JoinRequest.query.filter_by(invited_user=1, studygroup=1).first() is None:
         join_request = JoinRequest(invited_user_id=1, studygroup_id=1, message="LET ME IN!")

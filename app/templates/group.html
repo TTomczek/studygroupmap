@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'bootstrap5/form.html' import render_field, render_form %}
+{% from 'bootstrap5/form.html' import render_field %}
 {% from 'macros.html' import show_flashed_messages %}
 
 {% block basecontent %}
@@ -83,7 +83,12 @@
                 {% for user in member %}
                     <div class="basicContainer secondaryContainer groupMemberContainer">
                         <div class="white-text">{{ user.firstname }} {{ user.lastname }}
-                            Beigetreten am: {{ user.joiningdate | datetime }}</div>
+                            Beigetreten am: {{ user.joiningdate | datetime }}
+                        </div>
+                        <div class="contact white-text">
+                            <span>Tel: {{ user.phone }}</span>
+                            <span>Mail: {{ user.email }}</span>
+                        </div>
 
                         {% if user.id != current_user.id and current_user.id == form.owner.data %}
 
@@ -99,6 +104,7 @@
 
                             <form action="/group/{{ form.id.data }}/member/{{ user.id }}" method="POST"
                                   class="removeUserFromGroupForm">
+                                {{ form.csrf_token }}
                                 <button type="button" class="btn btn-danger btn-sm" onclick="confirmLeave(this)">
                                     Verlassen
                                 </button>
